@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/group3"
+            android:icon="@mipmap/ic_launcher"
+            android:title="毕业设计介绍"></item>
+        <item
+            android:id="@+id/group1"
+            android:icon="@mipmap/ic_launcher"
+            android:title="显示">
+            <menu>
+                <item
+                    android:id="@+id/drawer_home"
+                    android:icon="@mipmap/ic_launcher"
+                    android:title="电源" />
+
+                <item
+                    android:id="@+id/item1"
+                    android:icon="@mipmap/ic_launcher"
+                    android:title="时钟" />
+
+                <item
+                    android:id="@+id/item2"
+                    android:icon="@mipmap/ic_launcher"
+                    android:title="闹钟" />
+            </menu>
+        </item>
+
+        <item
+            android:id="@+id/group2"
+            android:icon="@mipmap/ic_launcher"
+            android:title="设置">
+            <menu>
+                <item
+                    android:id="@+id/drawer_home1"
+                    android:icon="@mipmap/ic_launcher"
+                    android:title="电源" />
+
+                <item
+                    android:id="@+id/setting1"
+                    android:icon="@mipmap/ic_launcher"
+                    android:title="时钟" />
+
+                <item
+                    android:id="@+id/setting2"
+                    android:icon="@mipmap/ic_launcher"
+                    android:title="闹钟" />
+            </menu>
+        </item>
+    </group>
+</menu>
