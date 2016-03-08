@@ -4,7 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gmail.kyleyeeyixin.multifunction_clock.MainActivity">
+    android:id="@+id/drawerlayout"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/multifunction"
+            app:titleTextColor="@color/white"
+            />
+    </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation"
@@ -12,20 +26,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/navigation_header_item"
-        app:menu="@menu/header" />
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:minHeight="?attr/actionBarSize"
-            android:background="#02dac1"
-            >
-        </android.support.v7.widget.Toolbar>
+        app:menu="@menu/header"></android.support.design.widget.NavigationView>
 
-    </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
 
 

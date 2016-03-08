@@ -2,41 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="#02dac1"
+    android:background="@color/multifunction"
     android:gravity="center"
-    >
+    android:orientation="vertical">
 
     <TextView
-        android:textColor="#ffffff"
-        android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="多功能时钟"
+        android:layout_marginTop="@dimen/margin_30"
+        android:text="@string/multifunction_clock"
+        android:textColor="@color/white"
         android:textSize="18sp" />
 
     <LinearLayout
-        android:layout_marginBottom="30dp"
         android:id="@+id/navigation_header_name"
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_30"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
-            android:textColor="#ffffff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:text="易鑫" />
+            android:layout_marginRight="@dimen/margin_20"
+            android:text="@string/yixin"
+            android:textColor="@color/white" />
 
         <TextView
-            android:textColor="#ffffff"
-            android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="王金龙" />
+            android:layout_marginLeft="@dimen/margin_20"
+            android:text="@string/wangjl"
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

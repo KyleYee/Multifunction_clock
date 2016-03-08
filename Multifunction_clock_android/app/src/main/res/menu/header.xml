@@ -2,50 +2,50 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/group3"
-            android:icon="@mipmap/ic_launcher"
-            android:title="毕业设计介绍"></item>
+            android:id="@+id/navigation_introduction"
+            android:icon="@drawable/ic_book_black_18dp"
+            android:title="@string/introduction"></item>
         <item
             android:id="@+id/group1"
-            android:icon="@mipmap/ic_launcher"
-            android:title="显示">
+            android:icon="@drawable/ic_slideshow_black_18dp"
+            android:title="@string/navigation_menu_show">
             <menu>
                 <item
-                    android:id="@+id/drawer_home"
-                    android:icon="@mipmap/ic_launcher"
-                    android:title="电源" />
+                    android:id="@+id/show_power"
+                    android:icon="@drawable/ic_power_settings_new_black_18dp"
+                    android:title="@string/navigation_menu_power" />
 
                 <item
-                    android:id="@+id/item1"
-                    android:icon="@mipmap/ic_launcher"
-                    android:title="时钟" />
+                    android:id="@+id/show_clock"
+                    android:icon="@drawable/ic_access_time_black_18dp"
+                    android:title="@string/navigation_menu_clock" />
 
                 <item
-                    android:id="@+id/item2"
-                    android:icon="@mipmap/ic_launcher"
-                    android:title="闹钟" />
+                    android:id="@+id/show_alarm_clock"
+                    android:icon="@drawable/ic_timer_black_18dp"
+                    android:title="@string/navigation_menu_alarm_clock" />
             </menu>
         </item>
 
         <item
             android:id="@+id/group2"
-            android:icon="@mipmap/ic_launcher"
-            android:title="设置">
+            android:icon="@drawable/ic_settings_black_18dp"
+            android:title="@string/navigation_menu_settings">
             <menu>
                 <item
-                    android:id="@+id/drawer_home1"
-                    android:icon="@mipmap/ic_launcher"
-                    android:title="电源" />
+                    android:id="@+id/setting_power"
+                    android:icon="@drawable/ic_power_settings_new_black_18dp"
+                    android:title="@string/navigation_menu_power" />
 
                 <item
-                    android:id="@+id/setting1"
-                    android:icon="@mipmap/ic_launcher"
-                    android:title="时钟" />
+                    android:id="@+id/setting_clock"
+                    android:icon="@drawable/ic_access_time_black_18dp"
+                    android:title="@string/navigation_menu_clock" />
 
                 <item
-                    android:id="@+id/setting2"
-                    android:icon="@mipmap/ic_launcher"
-                    android:title="闹钟" />
+                    android:id="@+id/setting_alarm_clock"
+                    android:icon="@drawable/ic_timer_black_18dp"
+                    android:title="@string/navigation_menu_alarm_clock" />
             </menu>
         </item>
     </group>
