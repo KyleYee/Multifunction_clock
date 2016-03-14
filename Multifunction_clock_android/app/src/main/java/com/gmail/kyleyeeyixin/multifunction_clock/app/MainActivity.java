@@ -1,4 +1,4 @@
-package com.gmail.kyleyeeyixin.multifunction_clock;
+package com.gmail.kyleyeeyixin.multifunction_clock.app;
 
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -6,10 +6,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonIntroduction;
+import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonalIntroduction;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.Net.NetManager;
+
+import java.io.UnsupportedEncodingException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +37,18 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initToolbar();
         initNavigation();
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    byte[] result = NetManager.receiveUDPdata();
+                    String resultstr = new String(result, "GB2312");
+                    Log.e("服务器", resultstr);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
     }
 
@@ -41,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
         mNavigationView.getHeaderView(0).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PersonIntroduction.StartIntroduction(MainActivity.this);
-                mDrawerLayout.closeDrawers();
+                PersonalIntroduction.StartIntroduction(MainActivity.this);
             }
         });
 
@@ -66,6 +82,17 @@ public class MainActivity extends AppCompatActivity {
                 mCurrntItem = item;
                 mToolbar.setTitle(item.getTitle());
                 mDrawerLayout.closeDrawers();
+                String str = "test";
+                byte data[];
+                data = str.getBytes();
+                final byte[] finalData = data;
+                new Thread() {
+                    @Override
+                    public void run() {
+                        NetManager.sendUDPdata(finalData);
+                    }
+                }.start();
+
                 return true;
             }
         });

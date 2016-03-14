@@ -1,11 +1,11 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,9 +15,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by yunnnn on 2016/3/8.
+ * Personal
+ * Created by yixin on 2016/3/8.
  */
-public class PersonIntroduction extends AppCompatActivity {
+public class PersonalIntroduction extends AppCompatActivity {
 
     @Bind(R.id.content)
     TextView mContent;
@@ -25,14 +26,14 @@ public class PersonIntroduction extends AppCompatActivity {
     Toolbar mToolbar;
 
     public static void StartIntroduction(Activity activity) {
-        Intent intent = new Intent(activity, PersonIntroduction.class);
+        Intent intent = new Intent(activity, PersonalIntroduction.class);
         activity.startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.person_introduction_activity);
+        setContentView(R.layout.personal_introduction_activity);
         ButterKnife.bind(this);
         initToolbar();
 
@@ -52,5 +53,11 @@ public class PersonIntroduction extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        return super.onKeyDown(keyCode, event);
     }
 }
