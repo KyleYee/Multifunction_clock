@@ -7,7 +7,8 @@
     android:id="@+id/drawerlayout"
     >
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -18,7 +19,8 @@
             android:background="@color/multifunction"
             app:titleTextColor="@color/white"
             />
-    </RelativeLayout>
+        <include layout="@layout/netactivity"></include>
+    </LinearLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation"

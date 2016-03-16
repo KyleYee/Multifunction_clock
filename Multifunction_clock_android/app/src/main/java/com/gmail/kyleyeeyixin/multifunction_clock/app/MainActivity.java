@@ -3,23 +3,23 @@ package com.gmail.kyleyeeyixin.multifunction_clock.app;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonalIntroduction;
-import com.gmail.kyleyeeyixin.multifunction_clock.module.Net.NetManager;
-
-import java.io.UnsupportedEncodingException;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.Net.UdpHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -27,29 +27,47 @@ public class MainActivity extends AppCompatActivity {
     NavigationView mNavigationView;
     @Bind(R.id.drawerlayout)
     DrawerLayout mDrawerLayout;
-
+    @Bind(R.id.edit)
+    EditText editText;
+    @Bind(R.id.layout)
+    LinearLayout layout;
     private MenuItem mCurrntItem;
+    private UdpHelper mUdpHelper;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
         ButterKnife.bind(this);
+        receiverData();
+    }
+
+    @Override
+    protected void initData() {
+        super.initData();
+        mUdpHelper = new UdpHelper();
+    }
+
+    @Override
+    protected void initView() {
+        super.initView();
         initToolbar();
         initNavigation();
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    byte[] result = NetManager.receiveUDPdata();
-                    String resultstr = new String(result, "GB2312");
-                    Log.e("服务器", resultstr);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+    }
 
+    @Override
+    protected int getContentId() {
+        return R.layout.activity_main;
+    }
+
+    private void receiverData() {
+        mUdpHelper.setOnReceiveListener(new UdpHelper.OnReceiveListener() {
+            @Override
+            public void onReceive(String receiveData) {
+                TextView textView = new TextView(MainActivity.this);
+                textView.setText(receiveData);
+                layout.addView(textView);
+            }
+        });
     }
 
     //设置侧边栏
@@ -82,17 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 mCurrntItem = item;
                 mToolbar.setTitle(item.getTitle());
                 mDrawerLayout.closeDrawers();
-                String str = "test";
-                byte data[];
-                data = str.getBytes();
-                final byte[] finalData = data;
-                new Thread() {
-                    @Override
-                    public void run() {
-                        NetManager.sendUDPdata(finalData);
-                    }
-                }.start();
-
                 return true;
             }
         });
@@ -106,5 +113,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.send)
+    public void onSend(View v) {
+        TextView textView = new TextView(this);
+        textView.setText("发送:" + editText.getText().toString().trim());
+        layout.addView(textView);
+        mUdpHelper.sendUDPdata(editText.getText().toString().trim().getBytes());
     }
 }

@@ -1,26 +1,32 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.module.Net;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 
 /**
- * Created by yunnnn on 2016/3/14.
+ * Created by yunnnn on 2016/3/16.
  */
-public class NetManager {
+public class UdpHelper implements Runnable {
 
+    public interface OnReceiveListener {
+        void onReceive(String receiveData);
+    }
 
-    public static void sendUDPdata(byte data[]) {
+    private OnReceiveListener onReceiveListener;
+
+    public void setOnReceiveListener(OnReceiveListener onReceiveListener) {
+        this.onReceiveListener = onReceiveListener;
+    }
+
+    public void sendUDPdata(byte data[]) {
         try {
             DatagramSocket datagramSocket = new DatagramSocket();
             InetAddress serverAddress = InetAddress.getByName("255.255.255.255");
-            DatagramPacket datagramPacket = new DatagramPacket(data, data.length, serverAddress, 8080);
+                DatagramPacket datagramPacket = new DatagramPacket(data, data.length, serverAddress, 8080);
             datagramSocket.send(datagramPacket);
             datagramSocket.close();
         } catch (IOException e) {
@@ -28,9 +34,9 @@ public class NetManager {
         }
     }
 
-    public static byte[] receiveUDPdata() {
+    public void receiveUDPdata() {
         try {
-            DatagramSocket socket = new DatagramSocket(8080);
+            DatagramSocket socket = new DatagramSocket(8081);
             //2、创建数据包，用于接收内容。
             byte[] buf = new byte[1024];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -42,10 +48,17 @@ public class NetManager {
             System.out.println(new String(packet.getData(), 0, packet.getLength()));
             //4、关闭连接。
             socket.close();
-            return buf;
+            String data = new String(buf, "UTF-8");
+            if (data != null) {
+                onReceiveListener.onReceive(data);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new byte[0];
+    }
+
+    @Override
+    public void run() {
+        receiveUDPdata();
     }
 }
