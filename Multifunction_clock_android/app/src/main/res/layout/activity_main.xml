@@ -19,7 +19,11 @@
             android:background="@color/multifunction"
             app:titleTextColor="@color/white"
             />
-        <include layout="@layout/netactivity"></include>
+        <RelativeLayout
+            android:id="@+id/fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </RelativeLayout>
     </LinearLayout>
 
     <android.support.design.widget.NavigationView

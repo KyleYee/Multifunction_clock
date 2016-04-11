@@ -11,41 +11,33 @@
             android:title="@string/navigation_menu_show">
             <menu>
                 <item
-                    android:id="@+id/show_power"
+                    android:id="@+id/power"
                     android:icon="@drawable/ic_power_settings_new_black_18dp"
                     android:title="@string/navigation_menu_power" />
 
                 <item
-                    android:id="@+id/show_clock"
+                    android:id="@+id/clock"
                     android:icon="@drawable/ic_access_time_black_18dp"
                     android:title="@string/navigation_menu_clock" />
 
                 <item
-                    android:id="@+id/show_alarm_clock"
+                    android:id="@+id/alarm_clock"
                     android:icon="@drawable/ic_timer_black_18dp"
                     android:title="@string/navigation_menu_alarm_clock" />
-            </menu>
-        </item>
-
-        <item
-            android:id="@+id/group2"
-            android:icon="@drawable/ic_settings_black_18dp"
-            android:title="@string/navigation_menu_settings">
-            <menu>
                 <item
-                    android:id="@+id/setting_power"
+                    android:id="@+id/stopwatch"
                     android:icon="@drawable/ic_power_settings_new_black_18dp"
-                    android:title="@string/navigation_menu_power" />
+                    android:title="@string/navigation_menu_stopwatch" />
 
                 <item
-                    android:id="@+id/setting_clock"
+                    android:id="@+id/temperature"
                     android:icon="@drawable/ic_access_time_black_18dp"
-                    android:title="@string/navigation_menu_clock" />
+                    android:title="@string/navigation_menu_temperature" />
 
                 <item
-                    android:id="@+id/setting_alarm_clock"
+                    android:id="@+id/chime"
                     android:icon="@drawable/ic_timer_black_18dp"
-                    android:title="@string/navigation_menu_alarm_clock" />
+                    android:title="@string/navigation_menu_chime" />
             </menu>
         </item>
     </group>
