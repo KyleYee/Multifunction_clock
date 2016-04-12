@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <me.itangqi.waveloadingview.WaveLoadingView
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginTop="100dp"
+        android:id="@+id/show_power"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginTop="80dp"
         app:wlv_borderColor="@color/multifunction"
         app:wlv_borderWidth="3dp"
-        app:wlv_progressValue="40"
+        app:wlv_progressValue="100"
         app:wlv_shapeType="circle"
         app:wlv_titleCenter="40 % "
         app:wlv_titleCenterColor="@android:color/black"
         app:wlv_titleCenterSize="24sp"
+        app:wlv_titleTop="剩余电量"
+        app:wlv_titleTopSize="24sp"
         app:wlv_waveAmplitude="70"
-        app:wlv_waveColor="@color/multifunction"
-        />
+        app:wlv_waveColor="@color/multifunction" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="10dp"
+        app:backgroundTint="@color/multifunction" />
 </RelativeLayout>

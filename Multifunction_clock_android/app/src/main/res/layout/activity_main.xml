@@ -7,7 +7,7 @@
     android:id="@+id/drawerlayout"
     >
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -20,11 +20,12 @@
             app:titleTextColor="@color/white"
             />
         <RelativeLayout
+            android:layout_below="@+id/toolbar"
             android:id="@+id/fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </RelativeLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation"

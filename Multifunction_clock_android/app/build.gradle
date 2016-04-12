@@ -26,4 +26,8 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'me.itangqi.waveloadingview:library:0.2.0'
+    compile 'com.squareup:android-times-square:1.6.5@aar'
+    compile 'com.prolificinteractive:material-calendarview:1.2.0'
+    compile 'com.google.code.gson:gson:2.4'
+
 }

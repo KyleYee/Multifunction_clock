@@ -1,14 +1,20 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.power;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
 
+import butterknife.Bind;
+import me.itangqi.waveloadingview.WaveLoadingView;
+
 /**
  * Created by yunnnn on 2016/4/11.
  */
 public class ShowPowerFragment extends BaseFragment {
+    @Bind(R.id.show_power)
+    WaveLoadingView mPower;
 
     @Override
     protected int getViewLayoutId() {
@@ -16,17 +22,7 @@ public class ShowPowerFragment extends BaseFragment {
     }
 
     @Override
-    protected void initData() {
-        super.initData();
-    }
-
-    @Override
-    protected void initView() {
-        super.initView();
-    }
-
-    @Override
-    protected void initListener() {
-        super.initListener();
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
     }
 }

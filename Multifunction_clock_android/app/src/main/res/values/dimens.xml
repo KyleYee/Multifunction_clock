@@ -9,8 +9,11 @@
     <dimen name="text_size_14">14sp</dimen>
     <dimen name="text_size_15">15sp</dimen>
     <dimen name="text_size_18">18sp</dimen>
+    <dimen name="text_size_20">20sp</dimen>
+    <dimen name="text_size_26">26sp</dimen>
     <dimen name="margin_30">30dp</dimen>
     <dimen name="margin_20">20dp</dimen>
+    <dimen name="divider_height">0.5dp</dimen>
 
     <dimen name="introduction_content_padding">8dp</dimen>
 </resources>

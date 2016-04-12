@@ -7,8 +7,20 @@
     <string name="introduction_name">易鑫 王金龙</string>
     <string name="introduction">毕业设计介绍</string>
     <string name="person_introduction">个人介绍</string>
+    <string name="custom_setting_time">自定义时钟设置</string>
+    <!--common-->
+    <string name="cancel">取消</string>
+    <string name="confirm">确定</string>
+    <string name="year">年</string>
+    <string name="month">月</string>
+    <string name="day">日</string>
+    <string name="hour">时</string>
+    <string name="minute">分</string>
+    <string name="second">秒</string>
+    <string name="empty">没有闹钟</string>
+    <string name="alarm_clock">闹钟</string>
 
-
+    
     <string name="navigation_menu_show">功能</string>
 
     <string name="navigation_menu_power">电量显示</string>
@@ -17,5 +29,12 @@
     <string name="navigation_menu_alarm_clock">闹钟设置</string>
     <string name="navigation_menu_temperature">温度显示</string>
     <string name="navigation_menu_chime">整点报时</string>
+    <string name="navigation_menu_memorial_day">纪念日</string>
+
+    <string name="setting_system_time">设置系统时间</string>
+    <string name="setting_custom_time">  自定义时间  </string>
+
+    <string name="setting_time">设置时间</string>
+    <string name="is_setting">是否将系统时间设置为多功能时钟时间？</string>
 
 </resources>

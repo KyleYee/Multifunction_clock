@@ -20,6 +20,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getContentId());
         init(savedInstanceState);
+        initListener();
     }
 
     protected int getContentId() {
@@ -45,5 +46,9 @@ public class BaseActivity extends AppCompatActivity {
     public void setContentView(View view, ViewGroup.LayoutParams params) {
         super.setContentView(view, params);
         ButterKnife.bind(this);
+    }
+
+    protected void initListener(){
+
     }
 }
