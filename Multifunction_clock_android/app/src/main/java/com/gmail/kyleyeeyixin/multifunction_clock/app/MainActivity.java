@@ -42,6 +42,12 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        myBluetoothManager.isEnable(MainActivity.this);
+    }
+
+    @Override
     protected void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
         initToolbar();

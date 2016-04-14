@@ -1,6 +1,7 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.LayoutRes;
@@ -8,19 +9,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.MyBluetoothManager;
+
 import butterknife.ButterKnife;
 
 /**
  * Created by yunnnn on 2016/3/16.
  */
 public class BaseActivity extends AppCompatActivity {
-
+    public MyBluetoothManager myBluetoothManager;
+    public Context mContext;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getApplicationContext();
+
         setContentView(getContentId());
         init(savedInstanceState);
         initListener();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myBluetoothManager =  MyBluetoothManager.getInstance(mContext);
     }
 
     protected int getContentId() {
@@ -28,6 +40,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void init(Bundle savedInstanceState) {
+
     }
 
     @Override

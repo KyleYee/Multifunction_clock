@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -18,12 +19,18 @@ import butterknife.ButterKnife;
  * Personal
  * Created by yixin on 2016/3/8.
  */
-public class PersonalIntroduction extends AppCompatActivity {
+public class PersonalIntroduction extends BaseActivity {
 
     @Bind(R.id.content)
     TextView mContent;
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myBluetoothManager.isEnable(PersonalIntroduction.this);
+    }
 
     public static void StartIntroduction(Activity activity) {
         Intent intent = new Intent(activity, PersonalIntroduction.class);
@@ -31,8 +38,13 @@ public class PersonalIntroduction extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected int getContentId() {
+        return R.layout.personal_introduction_activity;
+    }
+
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
         setContentView(R.layout.personal_introduction_activity);
         ButterKnife.bind(this);
         initToolbar();
