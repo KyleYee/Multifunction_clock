@@ -13,6 +13,11 @@ import me.itangqi.waveloadingview.WaveLoadingView;
  * Created by yunnnn on 2016/4/11.
  */
 public class ShowPowerFragment extends BaseFragment {
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     @Bind(R.id.show_power)
     WaveLoadingView mPower;
 

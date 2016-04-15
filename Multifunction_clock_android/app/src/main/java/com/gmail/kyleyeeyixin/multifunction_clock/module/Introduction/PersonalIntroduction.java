@@ -29,7 +29,6 @@ public class PersonalIntroduction extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        myBluetoothManager.isEnable(PersonalIntroduction.this);
     }
 
     public static void StartIntroduction(Activity activity) {

@@ -15,6 +15,7 @@ import android.view.View;
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonalIntroduction;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.alarm_clock.AlarmClockFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.stopwatch.StopWatchFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.time.TimeFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.power.ShowPowerFragment;
 
@@ -36,15 +37,14 @@ public class MainActivity extends BaseActivity {
     private Menu mMenu;
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(CURRENT_ITEM_ID, mCurrentItemID);
-        super.onSaveInstanceState(outState);
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        myBluetoothManager.isEnable(MainActivity.this);
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(CURRENT_ITEM_ID, mCurrentItemID);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -146,6 +146,7 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.stopwatch:
                 //秒表
+                stopWatch(mTransaction);
                 break;
             case R.id.temperature:
                 //温度显示
@@ -156,6 +157,12 @@ public class MainActivity extends BaseActivity {
             default:
                 break;
         }
+    }
+
+    //秒表
+    private void stopWatch(FragmentTransaction mTransaction) {
+        StopWatchFragment stopWatchFragment = new StopWatchFragment();
+        fragmentReplace(mTransaction, stopWatchFragment);
     }
 
     //显示时间

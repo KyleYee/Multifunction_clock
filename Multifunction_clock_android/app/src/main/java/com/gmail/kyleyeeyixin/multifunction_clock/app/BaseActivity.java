@@ -1,15 +1,14 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.app;
 
-import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.MyBluetoothManager;
+import android.widget.Toast;
 
 import butterknife.ButterKnife;
 
@@ -17,8 +16,9 @@ import butterknife.ButterKnife;
  * Created by yunnnn on 2016/3/16.
  */
 public class BaseActivity extends AppCompatActivity {
-    public MyBluetoothManager myBluetoothManager;
+    public BluetoothAdapter mBluetoothAdapter;
     public Context mContext;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +32,6 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        myBluetoothManager =  MyBluetoothManager.getInstance(mContext);
     }
 
     protected int getContentId() {
@@ -46,6 +45,15 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter != null) {
+            if (!mBluetoothAdapter.enable()) {
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivity(intent);
+            }
+        } else {
+            Toast.makeText(mContext, "此设备没有蓝牙", Toast.LENGTH_LONG).show();
+        }
         ButterKnife.bind(this);
     }
 
@@ -61,7 +69,7 @@ public class BaseActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    protected void initListener(){
+    protected void initListener() {
 
     }
 }

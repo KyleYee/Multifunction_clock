@@ -4,8 +4,10 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,13 +25,13 @@ import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.ShowBluetoothDeviceActivity;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.AlarmClock;
 import com.gmail.kyleyeeyixin.multifunction_clock.util.GSonUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +72,11 @@ public class AlarmClockFragment extends BaseFragment {
     private Handler handler = new Handler();
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(ALARM_CLOCK_LIST, (Serializable) mList);
         super.onSaveInstanceState(outState);
@@ -90,7 +97,19 @@ public class AlarmClockFragment extends BaseFragment {
         initData();
         initView();
         initListener();
-
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter != null) {
+            if (mBluetoothAdapter.getState() != BluetoothAdapter.STATE_ON) {
+                if (!mBluetoothAdapter.enable()) {
+                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivity(intent);
+                }
+            } else {
+                ShowBluetoothDeviceActivity.blueStartActivity(getContext());
+            }
+        } else {
+            mBluetoothAdapter.isEnabled();
+        }
     }
 
     public void initData() {

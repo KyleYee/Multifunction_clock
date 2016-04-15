@@ -8,6 +8,8 @@
     <string name="introduction">毕业设计介绍</string>
     <string name="person_introduction">个人介绍</string>
     <string name="custom_setting_time">自定义时钟设置</string>
+    <string name="search_device">搜索蓝牙设备</string>
+    <string name="start_match">开始配对</string>
     <!--common-->
     <string name="cancel">取消</string>
     <string name="confirm">确定</string>
@@ -17,10 +19,12 @@
     <string name="hour">时</string>
     <string name="minute">分</string>
     <string name="second">秒</string>
-    <string name="empty">没有闹钟</string>
+    <string name="empty_alarm_clock">没有闹钟</string>
+    <string name="empty_device">当前没有设备</string>
     <string name="alarm_clock">闹钟</string>
+    <string name="start">开始</string>
+    <string name="reset">复位</string>
 
-    
     <string name="navigation_menu_show">功能</string>
 
     <string name="navigation_menu_power">电量显示</string>
