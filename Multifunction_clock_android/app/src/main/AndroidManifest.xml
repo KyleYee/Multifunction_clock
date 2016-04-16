@@ -32,6 +32,8 @@
             android:name=".module.Introduction.time.CustomTimeActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".bluetooth.ShowBluetoothDeviceActivity"></activity>
+
+        <service android:name=".bluetooth.BluetoothService"></service>
     </application>
 
 </manifest>

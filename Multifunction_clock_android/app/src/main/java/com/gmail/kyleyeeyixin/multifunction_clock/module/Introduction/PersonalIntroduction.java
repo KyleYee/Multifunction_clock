@@ -16,7 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Personal
+ * Personal 介绍
  * Created by yixin on 2016/3/8.
  */
 public class PersonalIntroduction extends BaseActivity {

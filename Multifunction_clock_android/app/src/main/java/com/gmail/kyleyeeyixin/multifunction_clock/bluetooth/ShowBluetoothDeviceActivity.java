@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseActivity;
 
 import java.io.IOException;
@@ -35,14 +36,16 @@ import butterknife.Bind;
  */
 public class ShowBluetoothDeviceActivity extends BaseActivity {
     public static String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB";
-    private static final String DEVICE_NAME = "device_name";
-    private static final String DEVICE_ADDRESS = "device_address";
+    public static final String DEVICE_NAME = "device_name";
+    public static final String DEVICE_ADDRESS = "device_address";
+    public static final String BLUETOOTH_BROADCAST_CONNECT_SHOW = "show_connect";
 
     private Set<BluetoothDevice> mDevices;
     ArrayList<String> mNameList = new ArrayList<>();
     ArrayList<String> mAddressList = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
-    public static BluetoothSocket btSocket;
+    private boolean isConnecting = false;
+    private int mConnectedState = 0;
 
     @Bind(R.id.list_view)
     ListView mListView;
@@ -81,14 +84,25 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         // 注册广播接收器，接收并处理搜索结果
         this.registerReceiver(receiver, intentFilter);
+        //注册蓝牙链接广播
+        this.registerReceiver(connectReceiver, new IntentFilter(BLUETOOTH_BROADCAST_CONNECT_SHOW));
         mBluetoothAdapter.startDiscovery();
         mDevices = new HashSet<>();
     }
 
     private void initView() {
+        mDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice device : mDevices) {
+            mNameList.add(device.getName());
+            mAddressList.add(device.getAddress());
+        }
         mAdapter = new ArrayAdapter<String>(ShowBluetoothDeviceActivity.this,
                 android.R.layout.simple_list_item_1, mNameList);
         mListView.setAdapter(mAdapter);
+        if (mNameList == null && mNameList.size() == 0) {
+            mProgressbar.setVisibility(View.VISIBLE);
+            mProgressContent.setText(getString(R.string.search_device));
+        }
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -109,6 +123,29 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
             }
         }
     };
+    //连接广播
+    private BroadcastReceiver connectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //后台连接
+            if (BLUETOOTH_BROADCAST_CONNECT_SHOW.equals(intent.getAction())) {
+                final boolean isSuccess = intent.getBooleanExtra(AppContent.EXTRA_SUCCEED, false);
+                mConnectState = intent.getIntExtra(AppContent.EXTRA_CONNECT_STATE, 0);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressbar.setVisibility(View.GONE);
+                        if (isSuccess) {
+                            Toast.makeText(ShowBluetoothDeviceActivity.this, "连接成功", Toast.LENGTH_LONG).show();
+
+                        } else {
+                            Toast.makeText(ShowBluetoothDeviceActivity.this, "连接失败", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+        }
+    };
 
     //初始化toolbar
     private void initToolbar() {
@@ -123,8 +160,7 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
                 finish();
             }
         });
-        mProgressbar.setVisibility(View.VISIBLE);
-        mProgressContent.setText(getString(R.string.search_device));
+        ;
     }
 
     @Override
@@ -132,57 +168,31 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //获取当前连接状态
+                if (getConnectState() != AppContent.STATE_DISCONNECTED) {
+                    Toast.makeText(ShowBluetoothDeviceActivity.this, "当前已连接了蓝牙", Toast.LENGTH_LONG).show();
+                    return;
+                } else if (getConnectState() == AppContent.STATE_DISCONNECTED) {
+                    if (mBluetoothAdapter != null) {
+                        if (!mBluetoothAdapter.enable()) {
+                            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                            startActivity(intent);
+                        }
+                    }
+                }
+                mProgressbar.setVisibility(View.VISIBLE);
+                mProgressContent.setText(getString(R.string.start_match));
                 if (mBluetoothAdapter.isDiscovering())
                     mBluetoothAdapter.cancelDiscovery();
                 String address = mAddressList.get(position);
-                connect(address);
+                Intent intent = new Intent();
+                intent.setAction(AppContent.BLUETOOTH_BROADCAST_CONNECT);
+                intent.putExtra(DEVICE_ADDRESS, address);
+                sendBroadcast(intent);
                 Toast.makeText(ShowBluetoothDeviceActivity.this,
                         mNameList.get(position), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    /**
-     * 蓝牙配对
-     *
-     * @param address 蓝牙mac地址
-     */
-    private void connect(final String address) {
-        mProgressbar.setVisibility(View.VISIBLE);
-        mProgressContent.setText(getString(R.string.start_match));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mProgressbar.setVisibility(View.VISIBLE);
-                    mProgressContent.setText(getString(R.string.start_match));
-                    UUID uuid = UUID.fromString(SPP_UUID);
-                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                    btSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
-                    btSocket.connect();
-                    Toast.makeText(ShowBluetoothDeviceActivity.this, "开始配对。。。", Toast.LENGTH_LONG).show();
-                } catch (final IOException e) {
-                    btSocket = null;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mProgressbar.setVisibility(View.GONE);
-                            Toast.makeText(ShowBluetoothDeviceActivity.this, e.getMessage().toString(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    return;
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mProgressbar.setVisibility(View.GONE);
-                        Toast.makeText(ShowBluetoothDeviceActivity.this, "配对成功。。。", Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        }).start();
-
-
     }
 
     //显示设备

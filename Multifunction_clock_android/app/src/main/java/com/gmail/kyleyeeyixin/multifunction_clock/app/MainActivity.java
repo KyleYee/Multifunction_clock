@@ -1,5 +1,7 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.app;
 
+import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,12 +10,15 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.BluetoothService;
+import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.ShowBluetoothDeviceActivity;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonalIntroduction;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.ProjectFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.alarm_clock.AlarmClockFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.stopwatch.StopWatchFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.time.TimeFragment;
@@ -34,11 +39,30 @@ public class MainActivity extends BaseActivity {
 
     private int mCurrentItemID;
 
-    private Menu mMenu;
+    private Intent mServiceIntent;
+
+    private boolean isStartService = false;
+
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onResume() {
+        Log.e("resum", "=========resum");
+        if (!isStartService) {
+            mServiceIntent = new Intent(this, BluetoothService.class);
+            startService(mServiceIntent);
+            isStartService = true;
+        }
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.e("destroy", "==========destroy");
+        if (mServiceIntent != null) {
+            stopService(mServiceIntent);
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -58,8 +82,8 @@ public class MainActivity extends BaseActivity {
             mCurrentItemID = savedInstanceState.getInt(CURRENT_ITEM_ID);
             setFragment(mCurrentItemID, mTransaction);
         } else {
-            TimeFragment timeFragment = new TimeFragment();
-            mTransaction.replace(R.id.fragment, timeFragment);
+            ProjectFragment projectFragment = new ProjectFragment();
+            mTransaction.replace(R.id.fragment, projectFragment);
             mTransaction.commit();
         }
 
@@ -159,6 +183,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+
     //秒表
     private void stopWatch(FragmentTransaction mTransaction) {
         StopWatchFragment stopWatchFragment = new StopWatchFragment();
@@ -187,4 +212,6 @@ public class MainActivity extends BaseActivity {
     private void fragmentReplace(FragmentTransaction mTransaction, Fragment fragment) {
         mTransaction.replace(R.id.fragment, fragment);
     }
+
+
 }
