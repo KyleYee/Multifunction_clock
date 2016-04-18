@@ -12,7 +12,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -27,14 +29,63 @@ import java.util.UUID;
  * Created by kyleYee on 2016/4/15.
  */
 public class BluetoothService extends Service {
-
-
+    //连接成功
+    private static final int HANDLER_SUCCESS = 0;
+    //连接失败
+    private static final int HANDLER_FAILED = 1;
+    //接收数据
+    private static final int HANDLER_RECEIVER = 2;
     private BluetoothAdapter mAdapter;
     private BluetoothSocket btSocket;
     private InputStream mTmpIn;
     private OutputStream mTmpOut;
 
     private boolean isConnect = false;
+
+    //接收数据Handler
+    private Handler mReceiveHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case HANDLER_SUCCESS:
+                    //连接成功
+                    isConnect = true;
+                    new Thread(new Runnable() {
+                        public void run() {
+                            byte[] bufRecv = new byte[1024];
+                            int nRecv = 0;
+                            while (isConnect) {
+                                try {
+                                    nRecv = mTmpIn.read(bufRecv);
+                                    if (nRecv < 1) {
+                                        Thread.sleep(100);
+                                        continue;
+                                    }
+
+                                    byte[] nPacket = new byte[nRecv];
+                                    System.arraycopy(bufRecv, 0, nPacket, 0, nRecv);
+                                    mReceiveHandler.obtainMessage(HANDLER_RECEIVER,
+                                            nRecv, -1, nPacket).sendToTarget();
+                                    Thread.sleep(100);
+                                } catch (Exception e) {
+
+                                    break;
+                                }
+                            }
+                        }
+                    }).start();
+                    break;
+                case HANDLER_FAILED:
+                    //连接失败
+                    break;
+                case HANDLER_RECEIVER:
+                    byte[] bBuf = (byte[]) msg.obj;
+                    Log.e("========", "接收数据: " + bytesToString(bBuf, msg.arg1));
+                    break;
+            }
+
+        }
+    };
     //蓝牙状态监听
     private BluetoothGattCallback mGattCallBack = new BluetoothGattCallback() {
         @Override
@@ -44,54 +95,11 @@ public class BluetoothService extends Service {
             intent.putExtra(AppContent.EXTRA_CONNECT_STATE, newState);
             sendBroadcast(intent);
         }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            super.onServicesDiscovered(gatt, status);
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicRead(gatt, characteristic, status);
-        }
-
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicWrite(gatt, characteristic, status);
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            super.onCharacteristicChanged(gatt, characteristic);
-        }
-
-        @Override
-        public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-            super.onDescriptorRead(gatt, descriptor, status);
-        }
-
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-            super.onDescriptorWrite(gatt, descriptor, status);
-        }
-
-        @Override
-        public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
-            super.onReliableWriteCompleted(gatt, status);
-        }
-
-        @Override
-        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-            super.onReadRemoteRssi(gatt, rssi, status);
-        }
-
-        @Override
-        public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
-            super.onMtuChanged(gatt, mtu, status);
-        }
     };
 
-    //服务广播监听
+    /**
+     * 服务广播，用于处理Activity传来的数据
+     */
     private BroadcastReceiver mServiceBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -104,6 +112,10 @@ public class BluetoothService extends Service {
                     if (address != null) {
                         connect(address);
                     }
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_SEND:
+                    //发送数据
+                    send(null);
                     break;
             }
         }
@@ -120,6 +132,11 @@ public class BluetoothService extends Service {
                 startActivity(intent);
             }
         }
+
+        registerReceiver(mServiceBroadcastReceiver, getIntentFilter());
+    }
+
+    private IntentFilter getIntentFilter() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK);
         intentFilter.addAction(AppContent.BLUETOOTH_BROADCAST_CHIME);
@@ -129,7 +146,7 @@ public class BluetoothService extends Service {
         intentFilter.addAction(AppContent.BLUETOOTH_BROADCAST_TIME);
         intentFilter.addAction(AppContent.BLUETOOTH_BROADCAST_TMEPERATURE);
         intentFilter.addAction(AppContent.BLUETOOTH_BROADCAST_STOPWATCH);
-        registerReceiver(mServiceBroadcastReceiver, intentFilter);
+        return intentFilter;
     }
 
     @Override
@@ -137,19 +154,6 @@ public class BluetoothService extends Service {
         Log.e("onStartCommand", "==========service start");
         return super.onStartCommand(intent, flags, startId);
     }
-
-    @Override
-    public void onDestroy() {
-        Log.e("onDestroy", "==========service start");
-        super.onDestroy();
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
 
     /**
      * 蓝牙配对
@@ -180,16 +184,74 @@ public class BluetoothService extends Service {
                     tmpOut = null;
                     intent.putExtra(AppContent.EXTRA_SUCCEED, false);
                     sendBroadcast(intent);
+
                     return;
                 }
                 isConnect = true;
                 mTmpIn = tmpIn;
                 mTmpOut = tmpOut;
                 intent.putExtra(AppContent.EXTRA_SUCCEED, true);
-                intent.putExtra(AppContent.EXTRA_CONNECT_STATE,2);
+                intent.putExtra(AppContent.EXTRA_CONNECT_STATE, 2);
                 sendBroadcast(intent);
+                mReceiveHandler.sendEmptyMessage(HANDLER_SUCCESS);
             }
         }).start();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        Log.e("onDestroy", "==========service start");
+        closeAndExit();
+        super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    /* DEMO版较为简单，在编写您的应用时，请将此函数放到线程中执行，以免UI不响应 */
+    public void send(String strValue) {
+        if (!isConnect)
+            return;
+        try {
+            if (mTmpOut == null)
+                return;
+            mTmpOut.write(strValue.getBytes());
+            Log.e("========", "发送:" + strValue + "\r\n");
+        } catch (Exception e) {
+            Log.e("========", "失败:" + strValue + "\r\n");
+            return;
+        }
+    }
+
+    public static String bytesToString(byte[] b, int length) {
+        StringBuffer result = new StringBuffer("");
+        for (int i = 0; i < length; i++) {
+            result.append((char) (b[i]));
+        }
+
+        return result.toString();
+    }
+
+    public void closeAndExit() {
+        if (isConnect) {
+            isConnect = false;
+
+            try {
+                Thread.sleep(100);
+                if (mTmpOut != null)
+                    mTmpIn.close();
+                if (mTmpOut != null)
+                    mTmpOut.close();
+                if (btSocket != null)
+                    btSocket.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

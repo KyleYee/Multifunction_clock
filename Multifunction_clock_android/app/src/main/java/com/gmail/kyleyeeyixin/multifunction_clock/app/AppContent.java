@@ -4,6 +4,10 @@ package com.gmail.kyleyeeyixin.multifunction_clock.app;
  * Created by kyleYee on 2016/4/16.
  */
 public class AppContent {
+    //发送数据给单片机
+    public static final String BLUETOOTH_BROADCAST_SEND = "send";
+    //接收由单片机发来的数据
+    public static final String BLUETOOTH_BROADCAST_RECEIVE = "receive";
     //时钟设置蓝牙广播
     public static final String BLUETOOTH_BROADCAST_TIME = "service_broadcast_time";
     //链接蓝牙广播
