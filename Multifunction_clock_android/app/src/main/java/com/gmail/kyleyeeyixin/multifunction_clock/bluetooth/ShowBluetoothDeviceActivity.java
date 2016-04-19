@@ -130,7 +130,6 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
             //后台连接
             if (BLUETOOTH_BROADCAST_CONNECT_SHOW.equals(intent.getAction())) {
                 final boolean isSuccess = intent.getBooleanExtra(AppContent.EXTRA_SUCCEED, false);
-                mConnectState = intent.getIntExtra(AppContent.EXTRA_CONNECT_STATE, 0);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

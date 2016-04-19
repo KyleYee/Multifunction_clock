@@ -1,6 +1,7 @@
 package com.gmail.kyleyeeyixin.multifunction_clock.util;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -152,4 +153,18 @@ public class Utils {
         cmb.setText(text);
     }
 
+    public static BluetoothAdapter judgeConnectBluetooth(Activity activity) {
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter != null) {
+            if (!adapter.enable()) {
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                activity.startActivity(intent);
+            }
+            return adapter;
+        }
+        return adapter;
+    }
+
+
+    ;
 }

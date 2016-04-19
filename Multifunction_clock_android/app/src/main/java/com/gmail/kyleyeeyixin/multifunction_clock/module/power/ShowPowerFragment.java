@@ -1,7 +1,6 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.power;
+package com.gmail.kyleyeeyixin.multifunction_clock.module.power;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;

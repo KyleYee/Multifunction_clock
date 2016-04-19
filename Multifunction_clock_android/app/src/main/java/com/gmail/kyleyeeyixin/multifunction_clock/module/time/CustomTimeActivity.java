@@ -1,7 +1,6 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.time;
+package com.gmail.kyleyeeyixin.multifunction_clock.module.time;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -17,16 +16,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseActivity;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.time.Time;
+import com.gmail.kyleyeeyixin.multifunction_clock.util.Utils;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
-import com.prolificinteractive.materialcalendarview.format.DateFormatDayFormatter;
-import com.prolificinteractive.materialcalendarview.format.DayFormatter;
-import com.squareup.timessquare.CalendarPickerView;
-
-import java.util.Calendar;
-import java.util.Date;
 
 import butterknife.Bind;
 
@@ -109,6 +105,19 @@ public class CustomTimeActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int which) {
                 mHour = timePicker.getCurrentHour();
                 mMinute = timePicker.getCurrentMinute();
+                //发送时间给服务
+                Intent intent = new Intent();
+                intent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
+                Time time = new Time(mYear, mMonth, mDay, mHour, mMinute);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(AppContent.EXTRA_TIME, time);
+                intent.putExtra(TimeFragment.TIME_BUNDLE, bundle);
+
+                if (Utils.judgeConnectBluetooth(CustomTimeActivity.this) == null) {
+                    Toast.makeText(CustomTimeActivity.this, "请打开蓝牙", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                sendBroadcast(intent);
                 Toast.makeText(CustomTimeActivity.this, mHour + ":" + mMinute, Toast.LENGTH_LONG).show();
             }
         });

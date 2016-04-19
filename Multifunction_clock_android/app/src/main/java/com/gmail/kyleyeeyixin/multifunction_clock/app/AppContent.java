@@ -47,4 +47,6 @@ public class AppContent {
     public static final String EXTRA_SUCCEED = "extra_succeed";
     //链接状态
     public static final String EXTRA_CONNECT_STATE = "extra_connect_state";
+    //时间实体数据
+    public static final String EXTRA_TIME = "extra_time";
 }

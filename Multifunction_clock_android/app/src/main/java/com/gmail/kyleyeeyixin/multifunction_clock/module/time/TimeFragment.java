@@ -1,9 +1,10 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.time;
+package com.gmail.kyleyeeyixin.multifunction_clock.module.time;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -12,7 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.time.Time;
+import com.gmail.kyleyeeyixin.multifunction_clock.util.Utils;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -20,9 +24,12 @@ import java.util.TimeZone;
 import butterknife.Bind;
 
 /**
+ * 设置时间
  * Created by yunnnn on 2016/4/11.
  */
 public class TimeFragment extends BaseFragment {
+
+    public static final String TIME_BUNDLE = "time_bundle";
 
     @Bind(R.id.day)
     TextView mTvDay;
@@ -114,7 +121,19 @@ public class TimeFragment extends BaseFragment {
                 builder.setNegativeButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), "设置成功", Toast.LENGTH_SHORT).show();
+                        //发送时间给服务
+                        Intent intent = new Intent();
+                        intent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
+                        Time time = new Time(mYear, mMonth, mDay, mHour, mMinute);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(AppContent.EXTRA_TIME, time);
+                        intent.putExtra(TIME_BUNDLE, bundle);
+
+                        if (Utils.judgeConnectBluetooth(getActivity()) == null) {
+                            Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        getActivity().sendBroadcast(intent);
                     }
                 });
                 builder.setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {

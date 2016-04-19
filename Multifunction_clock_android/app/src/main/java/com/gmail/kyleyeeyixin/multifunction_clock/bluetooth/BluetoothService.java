@@ -5,20 +5,25 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.AlarmClock;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.time.Time;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock.AlarmClockFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.stopwatch.StopWatchFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,6 +40,12 @@ public class BluetoothService extends Service {
     private static final int HANDLER_FAILED = 1;
     //接收数据
     private static final int HANDLER_RECEIVER = 2;
+    //发送数据
+    private static final int HANDLER_SEND = 3;
+    //发送成功与失败
+    public static final String SEND_SUCCESS = "send_success1";
+    //是否发送成功
+    public static final String EXTRA_IS_SUCCESS = "extra_is_success";
     private BluetoothAdapter mAdapter;
     private BluetoothSocket btSocket;
     private InputStream mTmpIn;
@@ -79,6 +90,7 @@ public class BluetoothService extends Service {
                     //连接失败
                     break;
                 case HANDLER_RECEIVER:
+                    //接收成功
                     byte[] bBuf = (byte[]) msg.obj;
                     Log.e("========", "接收数据: " + bytesToString(bBuf, msg.arg1));
                     break;
@@ -117,6 +129,33 @@ public class BluetoothService extends Service {
                     //发送数据
                     send(null);
                     break;
+                case AppContent.BLUETOOTH_BROADCAST_TIME:
+                    //设置时间
+                    Bundle timeBundle = intent.getBundleExtra(TimeFragment.TIME_BUNDLE);
+                    Time time = (Time) timeBundle.getSerializable(AppContent.EXTRA_TIME);
+                    send(time.toString());
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_STOPWATCH:
+                    //跑表
+                    boolean isStart = intent.getBooleanExtra(StopWatchFragment.EXTRA_STOPWATCH, false);
+                    if (isStart) {
+                        //开始
+                        send("1");
+                    } else {
+                        //复位
+                        send("0");
+                    }
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK:
+                    //闹钟
+                    AlarmClock alarmClock = (AlarmClock) intent.getSerializableExtra(AlarmClockFragment.EXTRA_ALARM_CLOCK);
+                    if (alarmClock != null) {
+                        send(alarmClock.toString());
+                    }
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_CHIME:
+                    //整点报时
+                    send(null);
             }
         }
     };
@@ -171,7 +210,7 @@ public class BluetoothService extends Service {
                     UUID uuid = UUID.fromString(ShowBluetoothDeviceActivity.SPP_UUID);
                     BluetoothDevice device = mAdapter.getRemoteDevice(address);
                     device.connectGatt(BluetoothService.this, false, mGattCallBack);
-                    btSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+                    btSocket = device.createRfcommSocketToServiceRecord(uuid);
                     btSocket.connect();
                     tmpIn = btSocket.getInputStream();
                     tmpOut = btSocket.getOutputStream();
@@ -214,15 +253,36 @@ public class BluetoothService extends Service {
 
     /* DEMO版较为简单，在编写您的应用时，请将此函数放到线程中执行，以免UI不响应 */
     public void send(String strValue) {
-        if (!isConnect)
+        if (!isConnect) {
+            Toast.makeText(getApplicationContext(), "请连接蓝牙", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent();
+            intent.setAction(SEND_SUCCESS);
+            intent.putExtra(EXTRA_IS_SUCCESS, false);
+            sendBroadcast(intent);
             return;
+        }
         try {
-            if (mTmpOut == null)
+            if (mTmpOut == null) {
+                Toast.makeText(getApplicationContext(), "请连接蓝牙", Toast.LENGTH_SHORT).show();
+                Intent send = new Intent();
+                send.setAction(SEND_SUCCESS);
+                send.putExtra(EXTRA_IS_SUCCESS, false);
+                sendBroadcast(send);
                 return;
+            }
             mTmpOut.write(strValue.getBytes());
+            Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
+            Intent success = new Intent();
+            success.setAction(SEND_SUCCESS);
+            success.putExtra(EXTRA_IS_SUCCESS, true);
+            sendBroadcast(success);
             Log.e("========", "发送:" + strValue + "\r\n");
         } catch (Exception e) {
-            Log.e("========", "失败:" + strValue + "\r\n");
+            Intent failed = new Intent();
+            failed.setAction(SEND_SUCCESS);
+            failed.putExtra(EXTRA_IS_SUCCESS, false);
+            sendBroadcast(failed);
+            Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
             return;
         }
     }

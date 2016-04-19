@@ -1,4 +1,4 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.alarm_clock;
+package com.gmail.kyleyeeyixin.multifunction_clock.module.memoryday;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,10 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
-import com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.AlarmClock;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.chime.Chime;
 
 import java.util.List;
 
@@ -18,13 +17,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * 闹钟设置
+ * 整点报时
  * Created by yunnnn on 2016/4/13.
  */
-public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.ViewHolder> {
+public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<AlarmClock> mList;
+    private List<Chime> mList;
 
     //Item点击回调
     public interface OnItemClickListener {
@@ -48,7 +47,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         this.onSendListener = onSendListener;
     }
 
-    public AlarmClockAdapter(Context context, List<AlarmClock> list) {
+    public MemoryDayAdapter(Context context, List<Chime> list) {
         mContext = context;
         mList = list;
     }
@@ -70,12 +69,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                     holder.hour.setText(hour + "");
                 }
                 //设置分钟
-                final int minute = mList.get(position).getMinute();
-                if (minute < 10) {
-                    holder.minute.setText("0" + minute);
-                } else {
-                    holder.minute.setText(minute + "");
-                }
+                holder.minute.setText("00");
                 //点击发送事件
                 holder.send.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -101,13 +95,14 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         TextView minute;
         @Bind(R.id.send)
         ImageButton send;
-
+        @Bind(R.id.content)
+        TextView content;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-
+            content.setText("整点报时");
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

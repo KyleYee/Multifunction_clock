@@ -20,6 +20,8 @@
     <string name="minute">分</string>
     <string name="second">秒</string>
     <string name="empty_alarm_clock">没有闹钟</string>
+    <string name="empty_chime">没有设置整点报时</string>
+    <string name="empty_memory_day">谁有纪念日</string>
     <string name="empty_device">当前没有设备</string>
     <string name="alarm_clock">闹钟</string>
     <string name="start">开始</string>

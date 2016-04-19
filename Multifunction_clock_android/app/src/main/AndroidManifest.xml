@@ -29,7 +29,7 @@
             android:name=".module.Introduction.PersonalIntroduction"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".module.Introduction.time.CustomTimeActivity"
+            android:name=".module.time.CustomTimeActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".bluetooth.ShowBluetoothDeviceActivity"></activity>
 

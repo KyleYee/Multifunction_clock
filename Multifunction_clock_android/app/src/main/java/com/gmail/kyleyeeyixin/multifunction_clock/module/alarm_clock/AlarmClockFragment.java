@@ -1,13 +1,15 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.alarm_clock;
+package com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,10 +26,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
+import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.BluetoothService;
 import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.ShowBluetoothDeviceActivity;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.AlarmClock;
 import com.gmail.kyleyeeyixin.multifunction_clock.util.GSonUtil;
+import com.gmail.kyleyeeyixin.multifunction_clock.util.Utils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -56,6 +61,8 @@ public class AlarmClockFragment extends BaseFragment {
     private static final String ALARM_CLOCK_LIST = "alarm_list";
     public static final String ALARM_CLOCK_DATA = "alarm_data";
     public static final String LIST_ALARM_CLOCK_DATA = "alarm_list_data";
+    public static final String EXTRA_ALARM_CLOCK = "extra_alarm_clock";
+
 
     private AlarmClock mAlarmClock;
     private int mHour;
@@ -87,6 +94,16 @@ public class AlarmClockFragment extends BaseFragment {
         return R.layout.alarm_clock_activity;
     }
 
+    private BroadcastReceiver registerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BluetoothService.SEND_SUCCESS)) {
+                isSendSuccess = intent.getBooleanExtra(BluetoothService.EXTRA_IS_SUCCESS, false);
+                mProgressBar.setVisibility(View.GONE);
+            }
+        }
+    };
+
     @Override
     protected void init(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
@@ -97,6 +114,11 @@ public class AlarmClockFragment extends BaseFragment {
         initData();
         initView();
         initListener();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothService.SEND_SUCCESS);
+        getActivity().registerReceiver(registerReceiver, intentFilter);
+
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
             if (mBluetoothAdapter.getState() != BluetoothAdapter.STATE_ON) {
@@ -149,14 +171,17 @@ public class AlarmClockFragment extends BaseFragment {
             public void onSendClick(int position) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mList.get(position);
+                if (Utils.judgeConnectBluetooth(getActivity()) == null) {
+                    Toast.makeText(getContext(), "请打开wifi", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent();
+                intent.setAction(AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK);
+                intent.putExtra(EXTRA_ALARM_CLOCK, mList.get(position));
+                getActivity().sendBroadcast(intent);
+
                 Toast.makeText(getContext(), mList.get(position).getHour() + ":" +
                         mList.get(position).getMinute(), Toast.LENGTH_LONG).show();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mProgressBar.setVisibility(View.GONE);
-                    }
-                }, 2000);
             }
         });
     }

@@ -16,13 +16,14 @@ import android.view.View;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.BluetoothService;
-import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.ShowBluetoothDeviceActivity;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonalIntroduction;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.ProjectFragment;
-import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.alarm_clock.AlarmClockFragment;
-import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.stopwatch.StopWatchFragment;
-import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.time.TimeFragment;
-import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.power.ShowPowerFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock.AlarmClockFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.ChimeFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.memoryday.MemoryDayFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.stopwatch.StopWatchFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.power.ShowPowerFragment;
 
 import butterknife.Bind;
 
@@ -167,6 +168,7 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.chime:
                 //整点报时
+                settingChime(mTransaction);
                 break;
             case R.id.stopwatch:
                 //秒表
@@ -177,6 +179,7 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.memory_day:
                 //纪念日
+                settingMemoryDay(mTransaction);
                 break;
             default:
                 break;
@@ -208,6 +211,18 @@ public class MainActivity extends BaseActivity {
         fragmentReplace(mTransaction, alarmClockFragment);
     }
 
+
+    //整点报时
+    private void settingChime(FragmentTransaction mTransaction) {
+        ChimeFragment chimeFragment = new ChimeFragment();
+        fragmentReplace(mTransaction, chimeFragment);
+    }
+
+    //整点报时
+    private void settingMemoryDay(FragmentTransaction mTransaction) {
+        MemoryDayFragment memoryDayFragment = new MemoryDayFragment();
+        fragmentReplace(mTransaction, memoryDayFragment);
+    }
 
     private void fragmentReplace(FragmentTransaction mTransaction, Fragment fragment) {
         mTransaction.replace(R.id.fragment, fragment);

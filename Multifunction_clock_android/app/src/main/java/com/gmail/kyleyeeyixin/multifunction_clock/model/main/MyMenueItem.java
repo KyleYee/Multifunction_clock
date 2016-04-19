@@ -1,4 +1,4 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.main;
+package com.gmail.kyleyeeyixin.multifunction_clock.model.main;
 
 import android.view.MenuItem;
 
