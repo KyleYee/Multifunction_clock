@@ -20,8 +20,12 @@ import android.widget.Toast;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.AlarmClock;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.chime.Chime;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.memory_day.MemoryDay;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.time.Time;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock.AlarmClockFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.ChimeFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.memoryday.MemoryDayFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.stopwatch.StopWatchFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
 
@@ -155,7 +159,17 @@ public class BluetoothService extends Service {
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_CHIME:
                     //整点报时
-                    send(null);
+                    Chime chime = (Chime) intent.getSerializableExtra(ChimeFragment.EXTRA_CHIME);
+                    if (chime != null) {
+                        send(chime.toString());
+                    }
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY:
+                    MemoryDay memoryDay = (MemoryDay) intent.getSerializableExtra(MemoryDayFragment.EXTRA_MEMORY_DAY);
+                    if (memoryDay != null) {
+                        send(memoryDay.toString());
+                    }
+                    break;
             }
         }
     };
