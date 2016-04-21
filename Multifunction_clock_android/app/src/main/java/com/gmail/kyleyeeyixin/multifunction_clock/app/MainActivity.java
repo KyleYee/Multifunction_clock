@@ -134,7 +134,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // Handle the menu item
-                if (item.getItemId() == 1) {
+                if (item.getTitle().equals("蓝牙连接")) {
                     ShowBluetoothDeviceActivity.blueStartActivity(MainActivity.this);
                 }
                 return true;
@@ -261,7 +261,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, 1, 1, "蓝牙连接").setIcon(R.drawable.ic_settings_bluetooth_white_18dp);
+        menu.add(Menu.NONE, Menu.FIRST + 1, 0, "蓝牙连接").setIcon(R.drawable.ic_settings_bluetooth_white_18dp);
         return true;
     }
 

@@ -31,6 +31,7 @@ import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 /**
@@ -225,6 +226,13 @@ public class BluetoothService extends Service {
                     BluetoothDevice device = mAdapter.getRemoteDevice(address);
                     device.connectGatt(BluetoothService.this, false, mGattCallBack);
                     btSocket = device.createRfcommSocketToServiceRecord(uuid);
+                    // 连接建立之前的先配对
+                    if (device.getBondState() == BluetoothDevice.BOND_NONE) {
+                        Method creMethod = BluetoothDevice.class
+                                .getMethod("createBond");
+                        Log.e("TAG", "开始配对");
+                        creMethod.invoke(device);
+                    }
                     btSocket.connect();
                     tmpIn = btSocket.getInputStream();
                     tmpOut = btSocket.getOutputStream();
@@ -285,7 +293,7 @@ public class BluetoothService extends Service {
                 return;
             }
             mTmpOut.write(strValue.getBytes());
-            Toast.makeText(getApplicationContext(), "发送成功", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "连接成功", Toast.LENGTH_SHORT).show();
             Intent success = new Intent();
             success.setAction(SEND_SUCCESS);
             success.putExtra(EXTRA_IS_SUCCESS, true);
@@ -296,7 +304,7 @@ public class BluetoothService extends Service {
             failed.setAction(SEND_SUCCESS);
             failed.putExtra(EXTRA_IS_SUCCESS, false);
             sendBroadcast(failed);
-            Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "连接失败", Toast.LENGTH_SHORT).show();
             return;
         }
     }

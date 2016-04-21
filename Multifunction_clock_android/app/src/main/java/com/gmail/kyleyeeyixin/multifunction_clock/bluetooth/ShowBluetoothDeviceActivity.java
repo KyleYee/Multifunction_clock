@@ -203,4 +203,10 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBluetoothAdapter.cancelDiscovery();
+    }
 }
