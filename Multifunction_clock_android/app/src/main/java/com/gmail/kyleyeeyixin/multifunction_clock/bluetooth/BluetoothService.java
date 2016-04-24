@@ -140,10 +140,10 @@ public class BluetoothService extends Service {
                     boolean isStart = intent.getBooleanExtra(StopWatchFragment.EXTRA_STOPWATCH, false);
                     if (isStart) {
                         //开始
-                        send("1");
+                        send("20");
                     } else {
                         //复位
-                        send("0");
+                        send("23");
                     }
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK:
