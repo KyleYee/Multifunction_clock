@@ -11,6 +11,14 @@ public class Chime implements Serializable {
     private int hour;
     private int minute;
 
+    @Override
+    public String toString() {
+        return "Chime{" +
+                "hour=" + hour +
+                ", minute=" + minute +
+                '}';
+    }
+
     public int getHour() {
         return hour;
     }

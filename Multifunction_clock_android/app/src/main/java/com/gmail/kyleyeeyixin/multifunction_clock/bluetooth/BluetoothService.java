@@ -31,6 +31,7 @@ import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
@@ -57,6 +58,8 @@ public class BluetoothService extends Service {
     private OutputStream mTmpOut;
 
     private boolean isConnect = false;
+
+    private boolean isStopWatch = false;
 
     //接收数据Handler
     private Handler mReceiveHandler = new Handler() {
@@ -97,12 +100,13 @@ public class BluetoothService extends Service {
                 case HANDLER_RECEIVER:
                     //接收成功
                     byte[] bBuf = (byte[]) msg.obj;
-                    Log.e("========", "接收数据: " + bytesToString(bBuf, msg.arg1));
+                    bBuf = tenByteTo16byte(bBuf, bBuf.length);
+                    Log.e("===========", "接收数据:" +bBuf[0]);
                     break;
             }
-
         }
     };
+
     //蓝牙状态监听
     private BluetoothGattCallback mGattCallBack = new BluetoothGattCallback() {
         @Override
@@ -125,10 +129,19 @@ public class BluetoothService extends Service {
             switch (action) {
                 case AppContent.BLUETOOTH_BROADCAST_CONNECT:
                     //蓝牙链接
+                    Intent faild = new Intent();
+                    faild.setAction(ShowBluetoothDeviceActivity.BLUETOOTH_BROADCAST_CONNECT_SHOW);
+                    faild.putExtra(AppContent.EXTRA_SUCCEED, false);
                     String address = intent.getStringExtra(ShowBluetoothDeviceActivity.DEVICE_ADDRESS);
                     if (address != null) {
-                        connect(address);
+                        if (!isConnect) {
+                            connect(address);
+                            return;
+                        }
+                        sendBroadcast(faild);
+                        return;
                     }
+                    sendBroadcast(faild);
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_SEND:
                     //发送数据
@@ -142,14 +155,7 @@ public class BluetoothService extends Service {
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_STOPWATCH:
                     //跑表
-                    boolean isStart = intent.getBooleanExtra(StopWatchFragment.EXTRA_STOPWATCH, false);
-                    if (isStart) {
-                        //开始
-                        send("20");
-                    } else {
-                        //复位
-                        send("23");
-                    }
+                    sendStopWatch(intent);
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK:
                     //闹钟
@@ -166,6 +172,7 @@ public class BluetoothService extends Service {
                     }
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY:
+                    //纪念日
                     MemoryDay memoryDay = (MemoryDay) intent.getSerializableExtra(MemoryDayFragment.EXTRA_MEMORY_DAY);
                     if (memoryDay != null) {
                         send(memoryDay.toString());
@@ -292,8 +299,8 @@ public class BluetoothService extends Service {
                 sendBroadcast(send);
                 return;
             }
-            mTmpOut.write(strValue.getBytes());
-            Toast.makeText(getApplicationContext(), "连接成功", Toast.LENGTH_SHORT).show();
+            byte[] myByte = strValue.getBytes();
+            mTmpOut.write((byte) Integer.parseInt(strValue, 16));
             Intent success = new Intent();
             success.setAction(SEND_SUCCESS);
             success.putExtra(EXTRA_IS_SUCCESS, true);
@@ -318,6 +325,14 @@ public class BluetoothService extends Service {
         return result.toString();
     }
 
+    public static byte[] tenByteTo16byte(byte[] b, int length) {
+        byte[] bytes = new byte[1024];
+        for (int i = 0; i < length; i++) {
+            bytes[i] = Byte.parseByte(Integer.toHexString(b[i]));
+        }
+        return bytes;
+    }
+
     public void closeAndExit() {
         if (isConnect) {
             isConnect = false;
@@ -335,6 +350,29 @@ public class BluetoothService extends Service {
             }
         }
     }
+
+    //发送操作跑表的一系列操作
+    private void sendStopWatch(Intent intent) {
+        //跑表
+        String data = intent.getStringExtra(StopWatchFragment.EXTRA_STOPWATCH);
+        if (data.equals(StopWatchFragment.EXTRA_STOPWATCH_ENTER)) {
+            //进入跑表
+            send(AppContent.SEND_ENTER_STOPWATCH);
+        }
+        if (data.equals(StopWatchFragment.EXTRA_STOPWATCH_START)) {
+            //开始
+            send(AppContent.SEND_START_STOPWATCH);
+        }
+        if (data.equals(StopWatchFragment.EXTRA_STOPWATCH_RESET)) {
+            //复位
+            send(AppContent.SEND_RESET_STOPWATCH);
+        }
+        if (data.equals(StopWatchFragment.EXTRA_STOPWATCH_PAUSE)) {
+            //暂停
+            send(AppContent.SEND_PAUSE_STOPWATCH);
+        }
+    }
+
 }
 
 

@@ -12,6 +12,18 @@
         android:background="@drawable/time_button"
         android:text="@string/start"
         android:textColor="@color/white" />
+    <Button
+        android:layout_below="@+id/start"
+        android:id="@+id/pause"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/time_button"
+        android:text="@string/pause"
+        android:textColor="@color/white" />
 
     <Button
         android:textColor="@color/white"
@@ -19,7 +31,7 @@
         android:text="@string/reset"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_below="@+id/start"
+        android:layout_below="@+id/pause"
         android:layout_centerInParent="true"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"

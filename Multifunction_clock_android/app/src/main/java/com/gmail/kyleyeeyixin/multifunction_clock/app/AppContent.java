@@ -49,4 +49,25 @@ public class AppContent {
     public static final String EXTRA_CONNECT_STATE = "extra_connect_state";
     //时间实体数据
     public static final String EXTRA_TIME = "extra_time";
+
+    /**
+     * 发送命令的命令值
+     * 1.进入跑表   20
+     * 2.开始跑表   21
+     * 3.跑表暂停   22
+     * 4.跑表复位   23
+     * 5.时钟设置
+     * 6.闹钟设置
+     * 7.整点报时
+     * 8.纪念日
+     * 9.温度显示
+     * 10.电量显示
+     */
+    public static final String SEND_ENTER_STOPWATCH = "20";
+    public static final String SEND_START_STOPWATCH = "21";
+    public static final String SEND_PAUSE_STOPWATCH = "22";
+    public static final String SEND_RESET_STOPWATCH = "23";
+
+
+
 }

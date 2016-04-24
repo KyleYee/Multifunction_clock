@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Multifunction_clock</string>
+    <string name="app_name">多功能时钟</string>
 
     <string name="multifunction_clock">多功能时钟</string>
     <string name="yixin">易鑫</string>
@@ -25,6 +25,7 @@
     <string name="empty_device">当前没有设备</string>
     <string name="alarm_clock">闹钟</string>
     <string name="start">开始</string>
+    <string name="pause">暂停</string>
     <string name="reset">复位</string>
 
     <string name="navigation_menu_show">功能</string>

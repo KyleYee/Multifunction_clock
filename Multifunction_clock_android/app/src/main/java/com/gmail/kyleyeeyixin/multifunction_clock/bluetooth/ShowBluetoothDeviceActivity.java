@@ -188,8 +188,6 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
                 intent.setAction(AppContent.BLUETOOTH_BROADCAST_CONNECT);
                 intent.putExtra(DEVICE_ADDRESS, address);
                 sendBroadcast(intent);
-                Toast.makeText(ShowBluetoothDeviceActivity.this,
-                        mNameList.get(position), Toast.LENGTH_LONG).show();
             }
         });
     }
