@@ -12,17 +12,29 @@ public class Time implements Serializable {
     private int day;
     private int hour;
     private int minute;
+    private int week;
+
+    public int getWeek() {
+        return week;
+    }
+
+    public void setWeek(int week) {
+        this.week = week;
+    }
 
     public Time() {
     }
 
-    public Time(int year, int month, int day, int hour, int minute) {
+    public Time(int year, int month, int day, int hour, int minute, int week) {
         this.year = year;
         this.month = month;
         this.day = day;
         this.hour = hour;
         this.minute = minute;
+        this.week = week;
     }
+
+
 
     public int getYear() {
         return year;

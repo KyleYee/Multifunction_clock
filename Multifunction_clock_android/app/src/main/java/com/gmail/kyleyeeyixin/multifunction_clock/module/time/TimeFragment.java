@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +31,8 @@ import butterknife.Bind;
 public class TimeFragment extends BaseFragment {
 
     public static final String TIME_BUNDLE = "time_bundle";
+    public static final String TIME_ENTER = "time_enter";
+    public static final String TIME_SETTING  = "time_setting";
 
     @Bind(R.id.day)
     TextView mTvDay;
@@ -45,7 +48,8 @@ public class TimeFragment extends BaseFragment {
     private int mSec;
     private int mWeek;
     private int mYear;
-
+    private Intent mIntent;
+    private Handler handler = new Handler();
     @Override
     protected int getViewLayoutId() {
         return R.layout.time_fragment;
@@ -54,6 +58,7 @@ public class TimeFragment extends BaseFragment {
     @Override
     protected void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
+
         initData();
         initListener();
     }
@@ -122,18 +127,28 @@ public class TimeFragment extends BaseFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //发送时间给服务
-                        Intent intent = new Intent();
-                        intent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
-                        Time time = new Time(mYear, mMonth, mDay, mHour, mMinute);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable(AppContent.EXTRA_TIME, time);
-                        intent.putExtra(TIME_BUNDLE, bundle);
-
                         if (Utils.judgeConnectBluetooth(getActivity()) == null) {
                             Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
                             return;
                         }
+                        mIntent = new Intent();
+                        mIntent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
+
+                        Intent intent = new Intent();
+                        intent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
+                        intent.putExtra(TIME_BUNDLE,TIME_ENTER);
                         getActivity().sendBroadcast(intent);
+
+                        Time time = new Time(mYear, mMonth, mDay, mHour, mMinute,mWeek);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable(AppContent.EXTRA_TIME, time);
+                        mIntent.putExtra(TIME_BUNDLE, bundle);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().sendBroadcast(mIntent);
+                            }
+                        },100);
                     }
                 });
                 builder.setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -162,6 +177,5 @@ public class TimeFragment extends BaseFragment {
                 CustomTimeActivity.startActivity(getContext());
             }
         });
-
     }
 }

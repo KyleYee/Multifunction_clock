@@ -49,6 +49,15 @@
             android:layout_marginTop="5dp"
             android:text="@string/alarm_clock" />
 
+        <TextView
+            android:id="@+id/isOpen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dian"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@+id/content"
+            android:text="@string/alarm_clock" />
     </RelativeLayout>
 
     <View
@@ -59,13 +68,13 @@
         android:layout_marginRight="5dp"
         android:background="@color/divider"></View>
 
-    <ImageButton
+    <Switch
         android:id="@+id/send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="15dp"
-        android:background="@drawable/alarm_clcok_send_btn"
+        android:checked="false"
         android:padding="20dp" />
 </RelativeLayout>

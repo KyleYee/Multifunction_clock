@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -62,7 +63,11 @@ public class AlarmClockFragment extends BaseFragment {
     public static final String ALARM_CLOCK_DATA = "alarm_data";
     public static final String LIST_ALARM_CLOCK_DATA = "alarm_list_data";
     public static final String EXTRA_ALARM_CLOCK = "extra_alarm_clock";
+    public static final String EXTRA_ALARM_CLOCK_IS_OPEN = "extra_alarm_clock_is_open";
+    public static final String ALARM_CLOCK_ENTER = "alarm_clock_enter";
 
+    private static final int OPEN = 1;
+    private static final int CLOSE = 0;
 
     private AlarmClock mAlarmClock;
     private int mHour;
@@ -159,29 +164,50 @@ public class AlarmClockFragment extends BaseFragment {
         mAdapter.setOnItemClickListener(new AlarmClockAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                updateDialog(position);
+                Switch send = (Switch) v.findViewById(R.id.send);
+                updateDialog(position, send);
             }
         });
 
         //点击发送数据给蓝牙
         mAdapter.setOnSendListener(new AlarmClockAdapter.OnSendListener() {
             @Override
-            public void onSendClick(int position) {
+            public void onSendClick(int position, boolean isOpen) {
                 mProgressBar.setVisibility(View.VISIBLE);
-                mList.get(position);
+                //设置当前状态
+                mList.get(position).setType(isOpen);
                 if (Utils.judgeConnectBluetooth(getActivity()) == null) {
-                    Toast.makeText(getContext(), "请打开wifi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent intent = new Intent();
-                intent.setAction(AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK);
-                intent.putExtra(EXTRA_ALARM_CLOCK, mList.get(position));
-                getActivity().sendBroadcast(intent);
-
-                Toast.makeText(getContext(), mList.get(position).getHour() + ":" +
-                        mList.get(position).getMinute(), Toast.LENGTH_LONG).show();
+                //设置闹钟
+                setClock( mList.get(position));
             }
         });
+    }
+
+    /**
+     * 设置闹钟
+     *
+     */
+    private void setClock(AlarmClock alarmClock) {
+        //进入设置闹钟界面 广播
+        Intent enterIntent = new Intent();
+        enterIntent.setAction(AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK);
+        enterIntent.putExtra(ALARM_CLOCK_ENTER, true);
+        getActivity().sendBroadcast(enterIntent);
+
+        //设置闹钟广播
+        final Intent intent = new Intent();
+        intent.setAction(AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK);
+        //设置当前状态
+        intent.putExtra(EXTRA_ALARM_CLOCK, alarmClock);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().sendBroadcast(intent);
+            }
+        }, 100);
     }
 
     @OnClick(R.id.add)
@@ -207,6 +233,10 @@ public class AlarmClockFragment extends BaseFragment {
      * @param position
      */
     private void deleteRecycler(int position) {
+        AlarmClock alarmClock = new AlarmClock();
+        alarmClock = mList.get(position);
+        alarmClock.setType(false);
+        setClock(alarmClock);
         mList.remove(position);
         mAdapter.notifyItemRemoved(position);
         if (mList.size() == 0) {
@@ -214,7 +244,8 @@ public class AlarmClockFragment extends BaseFragment {
         }
     }
 
-    private void updateDialog(final int position) {
+    //更新
+    private void updateDialog(final int position, final Switch send) {
         final TimePicker timePicker = new TimePicker(getActivity());
         timePicker.setIs24HourView(true);
 
@@ -231,8 +262,10 @@ public class AlarmClockFragment extends BaseFragment {
                 mAlarmClock = new AlarmClock();
                 mAlarmClock.setHour(mHour);
                 mAlarmClock.setMinute(mMinute);
-                //添加闹钟
+                mAlarmClock.setType(send.isChecked());
+                //更新闹钟
                 upDataRecycler(mAlarmClock, position);
+                setClock(mAlarmClock);
             }
         });
 

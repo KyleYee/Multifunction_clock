@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -23,6 +24,8 @@ import com.gmail.kyleyeeyixin.multifunction_clock.util.Utils;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
+import java.util.Calendar;
 
 import butterknife.Bind;
 
@@ -41,6 +44,9 @@ public class CustomTimeActivity extends BaseActivity {
     private int mDay;
     private int mHour;
     private int mMinute;
+    private int mWeek;
+    private Intent mIntent;
+    private Handler handler = new Handler();
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, CustomTimeActivity.class);
@@ -81,9 +87,10 @@ public class CustomTimeActivity extends BaseActivity {
                 mYear = date.getYear();
                 mMonth = date.getMonth() + 1;
                 mDay = date.getDay();
-
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(mYear, mMonth - 1, mDay);
+                mWeek = calendar.get(Calendar.DAY_OF_WEEK);
                 showTimePickerDialog();
-
                 Toast.makeText(CustomTimeActivity.this, date.getYear() + ":" + (date.getMonth() + 1) + ":" + date.getDay(), Toast.LENGTH_LONG).show();
             }
         });
@@ -106,19 +113,28 @@ public class CustomTimeActivity extends BaseActivity {
                 mHour = timePicker.getCurrentHour();
                 mMinute = timePicker.getCurrentMinute();
                 //发送时间给服务
-                Intent intent = new Intent();
-                intent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
-                Time time = new Time(mYear, mMonth, mDay, mHour, mMinute);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(AppContent.EXTRA_TIME, time);
-                intent.putExtra(TimeFragment.TIME_BUNDLE, bundle);
-
                 if (Utils.judgeConnectBluetooth(CustomTimeActivity.this) == null) {
                     Toast.makeText(CustomTimeActivity.this, "请打开蓝牙", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                mIntent = new Intent();
+                mIntent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
+
+                Intent intent = new Intent();
+                intent.setAction(AppContent.BLUETOOTH_BROADCAST_TIME);
+                intent.putExtra(TimeFragment.TIME_BUNDLE, TimeFragment.TIME_ENTER);
                 sendBroadcast(intent);
-                Toast.makeText(CustomTimeActivity.this, mHour + ":" + mMinute, Toast.LENGTH_LONG).show();
+
+                Time time = new Time(mYear, mMonth, mDay, mHour, mMinute, mWeek);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(AppContent.EXTRA_TIME, time);
+                mIntent.putExtra(TimeFragment.TIME_BUNDLE, bundle);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sendBroadcast(mIntent);
+                    }
+                }, 100);
             }
         });
 

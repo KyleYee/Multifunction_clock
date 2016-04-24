@@ -26,6 +26,7 @@
     <string name="alarm_clock">闹钟</string>
     <string name="start">开始</string>
     <string name="pause">暂停</string>
+    <string name="please_connect_bluetooth">请连接蓝牙</string>
     <string name="reset">复位</string>
 
     <string name="navigation_menu_show">功能</string>

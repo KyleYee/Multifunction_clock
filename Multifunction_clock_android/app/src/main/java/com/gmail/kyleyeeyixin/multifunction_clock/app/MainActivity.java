@@ -95,10 +95,14 @@ public class MainActivity extends BaseActivity {
         if (savedInstanceState != null) {
             mCurrentItemID = savedInstanceState.getInt(CURRENT_ITEM_ID);
             setFragment(mCurrentItemID, mTransaction);
+            mToolbar.setTitle(getString(R.string.introduction));
+            mTransaction.commit();
         } else {
             ProjectFragment projectFragment = new ProjectFragment();
             mTransaction.replace(R.id.fragment, projectFragment);
             mTransaction.commit();
+            mToolbar.setTitle(getString(R.string.introduction));
+
         }
 
 
@@ -128,7 +132,6 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         setDrawerContent(mNavigationView);
-        mToolbar.inflateMenu(R.menu.header);
 
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -206,6 +209,9 @@ public class MainActivity extends BaseActivity {
                 //纪念日
                 settingMemoryDay(mTransaction);
                 break;
+            case R.id.navigation_introduction:
+                settingProduct(mTransaction);
+                break;
             default:
                 break;
         }
@@ -253,6 +259,12 @@ public class MainActivity extends BaseActivity {
     private void settingMemoryDay(FragmentTransaction mTransaction) {
         MemoryDayFragment memoryDayFragment = new MemoryDayFragment();
         fragmentReplace(mTransaction, memoryDayFragment);
+    }
+
+    //毕业设计介绍
+    private void settingProduct(FragmentTransaction mTransaction) {
+        ProjectFragment projectFragment = new ProjectFragment();
+        fragmentReplace(mTransaction, projectFragment);
     }
 
     private void fragmentReplace(FragmentTransaction mTransaction, Fragment fragment) {

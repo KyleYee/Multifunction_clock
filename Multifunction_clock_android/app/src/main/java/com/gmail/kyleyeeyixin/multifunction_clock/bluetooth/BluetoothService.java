@@ -100,8 +100,7 @@ public class BluetoothService extends Service {
                 case HANDLER_RECEIVER:
                     //接收成功
                     byte[] bBuf = (byte[]) msg.obj;
-                    bBuf = tenByteTo16byte(bBuf, bBuf.length);
-                    Log.e("===========", "接收数据:" +bBuf[0]);
+                    Log.e("===========", "接收数据:" + bBuf[0]);
                     break;
             }
         }
@@ -145,13 +144,10 @@ public class BluetoothService extends Service {
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_SEND:
                     //发送数据
-                    send(null);
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_TIME:
                     //设置时间
-                    Bundle timeBundle = intent.getBundleExtra(TimeFragment.TIME_BUNDLE);
-                    Time time = (Time) timeBundle.getSerializable(AppContent.EXTRA_TIME);
-                    send(time.toString());
+                    setTime(intent);
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_STOPWATCH:
                     //跑表
@@ -159,10 +155,7 @@ public class BluetoothService extends Service {
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_ALARM_CLOCK:
                     //闹钟
-                    AlarmClock alarmClock = (AlarmClock) intent.getSerializableExtra(AlarmClockFragment.EXTRA_ALARM_CLOCK);
-                    if (alarmClock != null) {
-                        send(alarmClock.toString());
-                    }
+                    setAlarmClock(intent);
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_CHIME:
                     //整点报时
@@ -181,6 +174,52 @@ public class BluetoothService extends Service {
             }
         }
     };
+
+    //设置闹钟
+    private void setAlarmClock(Intent intent) {
+        AlarmClock alarmClock = (AlarmClock) intent.getSerializableExtra(AlarmClockFragment.EXTRA_ALARM_CLOCK);
+        if (intent.getBooleanExtra(AlarmClockFragment.ALARM_CLOCK_ENTER, false)) {
+            send(AppContent.SEND_ENTER_ALARM_CLOCK);
+        }
+        if (alarmClock != null) {
+            int state;
+            if (alarmClock.isType()) {
+                state = 1;
+            } else {
+                state = 0;
+            }
+            byte[] bytes = new byte[10];
+            bytes[0] = (byte) Integer.parseInt(String.valueOf(state), 16);
+            bytes[1] = (byte) Integer.parseInt(String.valueOf(alarmClock.getHour()), 16);
+            bytes[2] = (byte) Integer.parseInt(String.valueOf(alarmClock.getMinute()), 16);
+            send(bytes);
+        }
+    }
+
+    /**
+     * 设置时间
+     *
+     * @param intent
+     */
+    private void setTime(Intent intent) {
+        Bundle timeBundle = intent.getBundleExtra(TimeFragment.TIME_BUNDLE);
+        if (timeBundle != null) {
+            Time time = (Time) timeBundle.getSerializable(AppContent.EXTRA_TIME);
+            byte[] bytes = new byte[10];
+            bytes[0] = (byte) Integer.parseInt(String.valueOf(time.getYear()).substring(2), 16);
+            bytes[1] = (byte) Integer.parseInt(String.valueOf(time.getMonth()), 16);
+            bytes[2] = (byte) Integer.parseInt(String.valueOf(time.getDay()), 16);
+            bytes[3] = (byte) Integer.parseInt(String.valueOf(time.getWeek()), 16);
+            bytes[4] = (byte) Integer.parseInt(String.valueOf(time.getHour()), 16);
+            bytes[5] = (byte) Integer.parseInt(String.valueOf(time.getMinute()), 16);
+            send(bytes);
+            return;
+        }
+
+        if (intent.getStringExtra(TimeFragment.TIME_BUNDLE) != null) {
+            send(AppContent.SEND_ENTER_TIME);
+        }
+    }
 
     @Override
     public void onCreate() {
@@ -316,6 +355,42 @@ public class BluetoothService extends Service {
         }
     }
 
+    /* DEMO版较为简单，在编写您的应用时，请将此函数放到线程中执行，以免UI不响应 */
+    public void send(byte[] strValue) {
+        if (!isConnect) {
+            Toast.makeText(getApplicationContext(), "请连接蓝牙", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent();
+            intent.setAction(SEND_SUCCESS);
+            intent.putExtra(EXTRA_IS_SUCCESS, false);
+            sendBroadcast(intent);
+            return;
+        }
+        try {
+            if (mTmpOut == null) {
+                Toast.makeText(getApplicationContext(), "请连接蓝牙", Toast.LENGTH_SHORT).show();
+                Intent send = new Intent();
+                send.setAction(SEND_SUCCESS);
+                send.putExtra(EXTRA_IS_SUCCESS, false);
+                sendBroadcast(send);
+                return;
+            }
+
+            mTmpOut.write(strValue);
+            Intent success = new Intent();
+            success.setAction(SEND_SUCCESS);
+            success.putExtra(EXTRA_IS_SUCCESS, true);
+            sendBroadcast(success);
+            Toast.makeText(getApplicationContext(), "设置成功", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Intent failed = new Intent();
+            failed.setAction(SEND_SUCCESS);
+            failed.putExtra(EXTRA_IS_SUCCESS, false);
+            sendBroadcast(failed);
+            Toast.makeText(getApplicationContext(), "设置失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
     public static String bytesToString(byte[] b, int length) {
         StringBuffer result = new StringBuffer("");
         for (int i = 0; i < length; i++) {
@@ -372,7 +447,6 @@ public class BluetoothService extends Service {
             send(AppContent.SEND_PAUSE_STOPWATCH);
         }
     }
-
 }
 
 
