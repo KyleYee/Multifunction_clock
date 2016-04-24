@@ -1,31 +1,29 @@
-package com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction;
+package com.gmail.kyleyeeyixin.multifunction_clock.module.temperature;
 
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
-import com.gmail.kyleyeeyixin.multifunction_clock.model.chime.Chime;
 
 import butterknife.Bind;
 
 /**
- * 项目介绍
- * Created by kyleYee on 2016/4/16.
+ * 温度显示
+ * Created by yunnnn on 2016/4/20.
  */
-public class ProjectFragment extends BaseFragment {
+public class TemperatureFragment extends BaseFragment {
+
     @Bind(R.id.content)
-    TextView textView;
+    TextView mContent;
 
     @Override
     protected void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
-        Chime chime = null;
-        textView.setText(chime + "");
     }
 
     @Override
     protected int getViewLayoutId() {
-        return R.layout.project_fragment;
+        return R.layout.temperature_fragment;
     }
 }

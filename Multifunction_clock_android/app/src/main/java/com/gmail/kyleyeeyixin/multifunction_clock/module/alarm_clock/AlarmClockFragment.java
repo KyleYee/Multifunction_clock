@@ -126,8 +126,6 @@ public class AlarmClockFragment extends BaseFragment {
                     Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivity(intent);
                 }
-            } else {
-                ShowBluetoothDeviceActivity.blueStartActivity(getContext());
             }
         } else {
             mBluetoothAdapter.isEnabled();

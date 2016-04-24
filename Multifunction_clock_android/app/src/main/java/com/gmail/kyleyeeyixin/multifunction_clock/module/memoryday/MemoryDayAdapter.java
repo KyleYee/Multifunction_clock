@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.chime.Chime;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.memory_day.MemoryDay;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -17,13 +20,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * 整点报时
+ * 纪念日
  * Created by yunnnn on 2016/4/13.
  */
 public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<Chime> mList;
+    private List<MemoryDay> mList;
 
     //Item点击回调
     public interface OnItemClickListener {
@@ -47,38 +50,34 @@ public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.View
         this.onSendListener = onSendListener;
     }
 
-    public MemoryDayAdapter(Context context, List<Chime> list) {
+    public MemoryDayAdapter(Context context, List<MemoryDay> list) {
         mContext = context;
         mList = list;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.alarm_clock_item, parent, false));
+        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.memory_day_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         if (holder instanceof ViewHolder) {
-            if (mList != null && mList.size() != 0) {
-                //设置小时
-                final int hour = mList.get(position).getHour();
-                if (hour < 10) {
-                    holder.hour.setText("0" + hour);
-                } else {
-                    holder.hour.setText(hour + "");
-                }
-                //设置分钟
-                holder.minute.setText("00");
-                //点击发送事件
-                holder.send.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onSendListener.onSendClick(position);
-                    }
-                });
-
+            if (holder == null) {
+                return;
             }
+            holder.content.setText(mList.get(position).getContent().toString());
+            holder.date.setText(mList.get(position).getYear() + "年" +
+                    mList.get(position).getMouth() + "月" +
+                    mList.get(position).getDay() + "日");
+
+            //点击发送事件
+            holder.send.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onSendListener.onSendClick(position);
+                }
+            });
         }
     }
 
@@ -89,20 +88,17 @@ public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.View
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.hour)
-        TextView hour;
-        @Bind(R.id.minute)
-        TextView minute;
-        @Bind(R.id.send)
-        ImageButton send;
         @Bind(R.id.content)
         TextView content;
+        @Bind(R.id.date)
+        TextView date;
+        @Bind(R.id.send)
+        ImageButton send;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            content.setText("整点报时");
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
