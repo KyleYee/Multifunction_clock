@@ -38,7 +38,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
 
     //Send点击回调
     public interface OnSendListener {
-        public void onSendClick(int position, boolean isOpen);
+        public void onSendClick(int position, boolean isOpen , Switch v);
     }
 
     private OnSendListener onSendListener;
@@ -79,7 +79,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                 holder.send.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onSendListener.onSendClick(position, holder.send.isChecked());
+                        onSendListener.onSendClick(position, holder.send.isChecked(),holder.send);
                         setIsOpen(holder, position);
                     }
                 });

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
@@ -38,7 +39,7 @@ public class ChimeAdapter extends RecyclerView.Adapter<ChimeAdapter.ViewHolder> 
 
     //Send点击回调
     public interface OnSendListener {
-        public void onSendClick(int position);
+        public void onSendClick(int position,boolean isOpen);
     }
 
     private OnSendListener onSendListener;
@@ -58,7 +59,7 @@ public class ChimeAdapter extends RecyclerView.Adapter<ChimeAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         if (holder instanceof ViewHolder) {
             if (mList != null && mList.size() != 0) {
                 //设置小时
@@ -74,13 +75,25 @@ public class ChimeAdapter extends RecyclerView.Adapter<ChimeAdapter.ViewHolder> 
                 holder.send.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onSendListener.onSendClick(position);
+                        onSendListener.onSendClick(position, holder.send.isChecked());
                     }
                 });
-
+                //设置打开或者关闭
+                setIsOpen(holder,position);
             }
         }
     }
+
+    private void setIsOpen(ViewHolder holder, int position) {
+        if (holder.send.isChecked()) {
+            mList.get(position).setType(true);
+            holder.isOpen.setText("打开");
+        } else {
+            mList.get(position).setType(false);
+            holder.isOpen.setText("关闭");
+        }
+    }
+
 
     @Override
     public int getItemCount() {
@@ -94,10 +107,11 @@ public class ChimeAdapter extends RecyclerView.Adapter<ChimeAdapter.ViewHolder> 
         @Bind(R.id.minute)
         TextView minute;
         @Bind(R.id.send)
-        ImageButton send;
+        Switch send;
         @Bind(R.id.content)
         TextView content;
-
+        @Bind(R.id.isOpen)
+        TextView isOpen;
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

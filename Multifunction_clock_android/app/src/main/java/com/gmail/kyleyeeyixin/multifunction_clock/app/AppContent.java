@@ -58,7 +58,7 @@ public class AppContent {
      * 4.跑表复位   23
      * 5.时钟设置   10
      * 6.闹钟设置   30
-     * 7.整点报时
+     * 7.整点报时   60
      * 8.纪念日
      * 9.温度显示
      * 10.电量显示
@@ -69,6 +69,6 @@ public class AppContent {
     public static final String SEND_RESET_STOPWATCH = "23";
     public static final String SEND_ENTER_TIME = "10";
     public static final String SEND_ENTER_ALARM_CLOCK = "30";
-
+    public static final String SEND_ENTER_CHIME = "60";
 
 }

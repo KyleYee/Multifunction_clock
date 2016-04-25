@@ -10,6 +10,15 @@ public class Chime implements Serializable {
     private static final long serialVersionUID = -5502555111184921046L;
     private int hour;
     private int minute;
+    private boolean type;
+
+    public boolean isType() {
+        return type;
+    }
+
+    public void setType(boolean type) {
+        this.type = type;
+    }
 
     @Override
     public String toString() {

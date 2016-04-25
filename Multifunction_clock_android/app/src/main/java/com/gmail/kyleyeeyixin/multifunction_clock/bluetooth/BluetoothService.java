@@ -25,6 +25,7 @@ import com.gmail.kyleyeeyixin.multifunction_clock.model.memory_day.MemoryDay;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.time.Time;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock.AlarmClockFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.ChimeFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.NewChimeFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.memoryday.MemoryDayFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.stopwatch.StopWatchFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
@@ -159,10 +160,7 @@ public class BluetoothService extends Service {
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_CHIME:
                     //整点报时
-                    Chime chime = (Chime) intent.getSerializableExtra(ChimeFragment.EXTRA_CHIME);
-                    if (chime != null) {
-                        send(chime.toString());
-                    }
+                    setChime(intent);
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY:
                     //纪念日
@@ -175,11 +173,25 @@ public class BluetoothService extends Service {
         }
     };
 
+    //设置整点报时
+    private void setChime(Intent intent) {
+        if (intent.getBooleanExtra(NewChimeFragment.ENTER_NEW_CHIME, false)) {
+            send(AppContent.SEND_ENTER_CHIME);
+            return;
+        }
+        if (intent.getBooleanExtra(NewChimeFragment.NEW_CHIME_STATE, false)) {
+            send("1");
+        } else {
+            send("0");
+        }
+    }
+
     //设置闹钟
     private void setAlarmClock(Intent intent) {
         AlarmClock alarmClock = (AlarmClock) intent.getSerializableExtra(AlarmClockFragment.EXTRA_ALARM_CLOCK);
         if (intent.getBooleanExtra(AlarmClockFragment.ALARM_CLOCK_ENTER, false)) {
             send(AppContent.SEND_ENTER_ALARM_CLOCK);
+            return;
         }
         if (alarmClock != null) {
             int state;
@@ -188,10 +200,12 @@ public class BluetoothService extends Service {
             } else {
                 state = 0;
             }
-            byte[] bytes = new byte[10];
+            byte[] bytes = new byte[1];
             bytes[0] = (byte) Integer.parseInt(String.valueOf(state), 16);
-            bytes[1] = (byte) Integer.parseInt(String.valueOf(alarmClock.getHour()), 16);
-            bytes[2] = (byte) Integer.parseInt(String.valueOf(alarmClock.getMinute()), 16);
+            send(bytes);
+            bytes[0] = (byte) Integer.parseInt(String.valueOf(alarmClock.getHour()), 16);
+            send(bytes);
+            bytes[0] = (byte) Integer.parseInt(String.valueOf(alarmClock.getMinute()), 16);
             send(bytes);
         }
     }

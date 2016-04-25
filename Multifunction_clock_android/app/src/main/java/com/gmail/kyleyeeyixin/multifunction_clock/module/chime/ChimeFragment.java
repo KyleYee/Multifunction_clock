@@ -155,12 +155,13 @@ public class ChimeFragment extends BaseFragment {
 
         //点击发送数据给蓝牙
         mAdapter.setOnSendListener(new ChimeAdapter.OnSendListener() {
+
             @Override
-            public void onSendClick(int position) {
+            public void onSendClick(int position,boolean isOpen) {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mList.get(position);
                 if (Utils.judgeConnectBluetooth(getActivity()) == null) {
-                    Toast.makeText(getContext(), "请打开wifi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Intent intent = new Intent();

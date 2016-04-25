@@ -82,12 +82,21 @@ public class AlarmClockFragment extends BaseFragment {
     private String mGsonList;
     private String mNewGsonList;
     private Handler handler = new Handler();
+    private int mDeletePosition = -1;
+
+    private boolean isDelete = false;
+    private boolean isUpdate = false;
+    private boolean isSending = false;
+    private Switch mSwitch;
+    private int mPosition = -1;
+    private boolean mSwitchState = false;
 
     @Override
     public void onResume() {
         super.onResume();
     }
 
+    //保存状态
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(ALARM_CLOCK_LIST, (Serializable) mList);
@@ -116,6 +125,9 @@ public class AlarmClockFragment extends BaseFragment {
         } else {
             mList = new ArrayList<>();
         }
+        //发送成功 接收器
+        IntentFilter getIntentFilter = new IntentFilter(BluetoothService.SEND_SUCCESS);
+        getActivity().registerReceiver(receiver, getIntentFilter);
         initData();
         initView();
         initListener();
@@ -164,15 +176,19 @@ public class AlarmClockFragment extends BaseFragment {
         mAdapter.setOnItemClickListener(new AlarmClockAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
+                mPosition = position;
                 Switch send = (Switch) v.findViewById(R.id.send);
                 updateDialog(position, send);
             }
         });
 
-        //点击发送数据给蓝牙
+        //点击发送数据给蓝牙   发送按键
         mAdapter.setOnSendListener(new AlarmClockAdapter.OnSendListener() {
             @Override
-            public void onSendClick(int position, boolean isOpen) {
+            public void onSendClick(int position, boolean isOpen, Switch v) {
+                isSending = true;
+                mSwitch = v;
+                mSwitchState = v.isChecked();
                 mProgressBar.setVisibility(View.VISIBLE);
                 //设置当前状态
                 mList.get(position).setType(isOpen);
@@ -181,14 +197,13 @@ public class AlarmClockFragment extends BaseFragment {
                     return;
                 }
                 //设置闹钟
-                setClock( mList.get(position));
+                setClock(mList.get(position));
             }
         });
     }
 
     /**
      * 设置闹钟
-     *
      */
     private void setClock(AlarmClock alarmClock) {
         //进入设置闹钟界面 广播
@@ -207,12 +222,16 @@ public class AlarmClockFragment extends BaseFragment {
             public void run() {
                 getActivity().sendBroadcast(intent);
             }
-        }, 100);
+        }, 1000);
     }
 
     @OnClick(R.id.add)
     public void onAdd(View v) {
-        showDialog();
+        if (mList.size() < 5) {
+            showDialog();
+        } else {
+            Toast.makeText(getActivity(), "现在只支持5个哦~~~", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -233,15 +252,14 @@ public class AlarmClockFragment extends BaseFragment {
      * @param position
      */
     private void deleteRecycler(int position) {
-        AlarmClock alarmClock = new AlarmClock();
-        alarmClock = mList.get(position);
-        alarmClock.setType(false);
-        setClock(alarmClock);
+        mAlarmClock = new AlarmClock();
+        mAlarmClock = mList.get(position);
+        mAlarmClock.setType(false);
+        mPosition = position;
         mList.remove(position);
         mAdapter.notifyItemRemoved(position);
-        if (mList.size() == 0) {
-            mEmpty.setVisibility(View.VISIBLE);
-        }
+        setClock(mAlarmClock);
+        isDelete = true;
     }
 
     //更新
@@ -264,8 +282,23 @@ public class AlarmClockFragment extends BaseFragment {
                 mAlarmClock.setMinute(mMinute);
                 mAlarmClock.setType(send.isChecked());
                 //更新闹钟
-                upDataRecycler(mAlarmClock, position);
+                if (send.isChecked()) {
+                    mAlarmClock.setType(false);
+                    setClock(mAlarmClock);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAlarmClock.setType(true);
+                            setClock(mAlarmClock);
+                            mPosition = position;
+                            isUpdate = true;
+                        }
+                    }, 1500);
+                    return;
+                }
                 setClock(mAlarmClock);
+                mPosition = position;
+                isUpdate = true;
             }
         });
 
@@ -311,7 +344,7 @@ public class AlarmClockFragment extends BaseFragment {
                 mAlarmClock = new AlarmClock();
                 mAlarmClock.setHour(mHour);
                 mAlarmClock.setMinute(mMinute);
-                //添加闹钟
+                mAlarmClock.setType(false);
                 mList.add(mAlarmClock);
                 mAdapter.notifyDataSetChanged();
             }
@@ -347,11 +380,45 @@ public class AlarmClockFragment extends BaseFragment {
         mEditor.commit();
         mEditor.putString(LIST_ALARM_CLOCK_DATA, mNewGsonList);
         mEditor.commit();
+
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isSuccess = intent.getBooleanExtra(BluetoothService.EXTRA_IS_SUCCESS, false);
+            if (isSuccess) {
+                if (isUpdate) {
+                    upDataRecycler(mAlarmClock, mPosition);
+                    isUpdate = false;
+                }
+                if (isDelete) {
+                    if (mList.size() == 0) {
+                        mEmpty.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                    isDelete = false;
+                }
+            } else {
+                if (isSending) {
+                    isSending = false;
+                    mSwitch.setChecked(!mSwitchState);
+                }
+                if (isDelete) {
+                    isDelete = false;
+                    mList.add(mPosition, mAlarmClock);
+                    if (mList.size() != 0) {
+                        mEmpty.setVisibility(View.GONE);
+                        return;
+                    }
+                }
+            }
+        }
+    };
 }

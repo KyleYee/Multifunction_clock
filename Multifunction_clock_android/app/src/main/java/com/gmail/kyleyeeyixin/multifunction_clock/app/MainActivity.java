@@ -26,6 +26,7 @@ import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.PersonalIn
 import com.gmail.kyleyeeyixin.multifunction_clock.module.Introduction.ProjectFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock.AlarmClockFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.ChimeFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.NewChimeFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.memoryday.MemoryDayFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.stopwatch.StopWatchFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.temperature.TemperatureFragment;
@@ -251,7 +252,7 @@ public class MainActivity extends BaseActivity {
 
     //整点报时
     private void settingChime(FragmentTransaction mTransaction) {
-        ChimeFragment chimeFragment = new ChimeFragment();
+        NewChimeFragment chimeFragment = new NewChimeFragment();
         fragmentReplace(mTransaction, chimeFragment);
     }
 
