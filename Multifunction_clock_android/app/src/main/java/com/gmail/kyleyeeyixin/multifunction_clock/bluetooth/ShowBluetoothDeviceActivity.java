@@ -206,5 +206,7 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mBluetoothAdapter.cancelDiscovery();
+        unregisterReceiver(receiver);
+        unregisterReceiver(connectReceiver);
     }
 }

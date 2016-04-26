@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="当前温度：50度"
+        android:text="请刷新"
         android:textSize="@dimen/text_size_26" />
 
     <android.support.design.widget.FloatingActionButton
@@ -23,4 +23,26 @@
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_refresh_white_18dp"
         app:backgroundTint="@color/multifunction" />
+
+
+    <LinearLayout
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/progressbar_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在刷新..." />
+    </LinearLayout>
 </RelativeLayout>

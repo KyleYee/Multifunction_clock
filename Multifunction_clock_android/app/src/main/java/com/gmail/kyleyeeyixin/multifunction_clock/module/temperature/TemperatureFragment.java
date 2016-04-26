@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
@@ -26,15 +27,23 @@ public class TemperatureFragment extends BaseFragment {
 
     @Bind(R.id.content)
     TextView mContent;
+    @Bind(R.id.progressbar)
+    LinearLayout mProgressbar;
+    //温度
     public static final String REFRESH_DATA = "refresh_data";
+    //湿度
+    public static final String DATA = "shidu";
     public static final String REFRESH = "refresh";
     public static final String SAVE_DATA = "save_data";
+    public static final String SAVE_SHI_DU = "save_shi_du";
     public static final String SAVE_SHARE_TEMPERATURE = "temperature";
-    private int mGetData;
+    private int mGetData = -1;
+    private int mShidu = -1;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            mContent.setText(msg.what);
+            mContent.setText("当前温度：" + msg.what + "度\n当前湿度：" + msg.arg1);
+            mProgressbar.setVisibility(View.GONE);
         }
     };
     private SharedPreferences mShare;
@@ -43,6 +52,7 @@ public class TemperatureFragment extends BaseFragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(SAVE_DATA, mGetData);
+        outState.putInt(SAVE_SHI_DU, mShidu);
         super.onSaveInstanceState(outState);
     }
 
@@ -58,11 +68,14 @@ public class TemperatureFragment extends BaseFragment {
         super.init(savedInstanceState);
         if (savedInstanceState != null) {
             mGetData = savedInstanceState.getInt(SAVE_DATA);
+            mShidu = savedInstanceState.getInt(SAVE_SHI_DU);
         }
         mShare = getActivity().getSharedPreferences(SAVE_SHARE_TEMPERATURE, Context.MODE_PRIVATE);
+        mEditor = mShare.edit();
         mGetData = mShare.getInt(SAVE_DATA, -1);
-        if (mGetData != -1) {
-            mContent.setText(mGetData);
+        mShidu = mShare.getInt(SAVE_SHI_DU, -1);
+        if (mGetData != -1 && mShidu != -1) {
+            mContent.setText("当前温度：" + mGetData + "度\n当前湿度：" + mShidu);
         }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(REFRESH);
@@ -79,8 +92,14 @@ public class TemperatureFragment extends BaseFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             mGetData = intent.getIntExtra(REFRESH_DATA, -1);
+            mShidu = intent.getIntExtra(DATA, -1);
+            mGetData = mGetData / 16 * 10 + mGetData % 16 % 10;
+            mShidu = mShidu / 16 * 10 + mShidu % 16 % 10;
             if (mGetData != -1) {
-                mHandler.sendEmptyMessage(mGetData);
+                Message message = new Message();
+                message.what = mGetData;
+                message.arg1 = mShidu;
+                mHandler.sendMessage(message);
             }
         }
     };
@@ -90,6 +109,7 @@ public class TemperatureFragment extends BaseFragment {
         super.onDestroy();
         getActivity().unregisterReceiver(receiver);
         mEditor.putInt(SAVE_DATA, mGetData);
+        mEditor.putInt(SAVE_SHI_DU, mShidu);
         mEditor.commit();
     }
 }

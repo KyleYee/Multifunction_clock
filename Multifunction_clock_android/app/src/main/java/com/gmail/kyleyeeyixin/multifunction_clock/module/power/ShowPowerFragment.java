@@ -32,11 +32,12 @@ public class ShowPowerFragment extends BaseFragment {
     WaveLoadingView mPower;
     public static final String SAVE_DATA = "save_data";
     public static final String SAVE_SHARE_POWER = "power";
-    private int mGetData;
+    private int mGetData = -1;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            mPower.setCenterTitle(msg.what + "");
+            mPower.setCenterTitle(msg.what + "%");
+            mPower.setProgressValue(msg.what);
         }
     };
     private SharedPreferences mShare;
@@ -63,6 +64,7 @@ public class ShowPowerFragment extends BaseFragment {
             mPower.setCenterTitle(mGetData + "");
         }
         mShare = getActivity().getSharedPreferences(SAVE_SHARE_POWER, Context.MODE_PRIVATE);
+        mEditor = mShare.edit();
         mGetData = mShare.getInt(SAVE_DATA, -1);
         if (mGetData != -1) {
             mPower.setCenterTitle(mGetData + "");
@@ -82,6 +84,7 @@ public class ShowPowerFragment extends BaseFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             mGetData = intent.getIntExtra(TemperatureFragment.REFRESH_DATA, -1);
+            mGetData = mGetData / 16 * 10 + mGetData % 16 % 10;
             if (mGetData != -1) {
                 mHandler.sendEmptyMessage(mGetData);
             }

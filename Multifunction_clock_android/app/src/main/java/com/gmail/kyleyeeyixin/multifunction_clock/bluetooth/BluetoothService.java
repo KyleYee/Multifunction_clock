@@ -64,7 +64,10 @@ public class BluetoothService extends Service {
     private boolean isStopWatch = false;
 
     private boolean isRefresh = false;
-
+    private boolean isTempera = false;
+    private boolean isPower = false;
+    //根据需求控制温湿度显示循环
+    private int count = 0;
     //接收数据Handler
     private Handler mReceiveHandler = new Handler() {
         @Override
@@ -105,12 +108,24 @@ public class BluetoothService extends Service {
                     //接收成功
                     byte[] bBuf = (byte[]) msg.obj;
                     Log.e("===========", "接收数据:" + bBuf[0]);
-                    if (isRefresh) {
+                    if (isTempera) {
+                        count += 1;
+                        if (count != 1) {
+                            Intent intent = new Intent();
+                            intent.setAction(TemperatureFragment.REFRESH);
+                            intent.putExtra(TemperatureFragment.DATA,(int) bBuf[0]);
+                            intent.putExtra(TemperatureFragment.REFRESH_DATA, (int) bBuf[1]);
+                            sendBroadcast(intent);
+                            isTempera = false;
+                            count = 0;
+                        }
+                    }
+                    if (isPower) {
                         Intent intent = new Intent();
                         intent.setAction(TemperatureFragment.REFRESH);
-                        intent.putExtra(TemperatureFragment.REFRESH_DATA, bBuf[0]);
+                        intent.putExtra(TemperatureFragment.REFRESH_DATA, bBuf[1]);
                         sendBroadcast(intent);
-                        isRefresh = false;
+                        isPower = false;
                     }
                     break;
             }
@@ -192,11 +207,13 @@ public class BluetoothService extends Service {
 
     //设置温度
     private void setTem(Intent intent) {
-        send(AppContent.BLUETOOTH_BROADCAST_TMEPERATURE);
+        isTempera = true;
+        send(AppContent.SEND_ENTER_TEMPERATURE);
     }
 
     //设置电量
     private void setPower(Intent intent) {
+        isPower = true;
         send(AppContent.BLUETOOTH_BROADCAST_POWER);
     }
 
