@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -31,8 +32,10 @@ import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.BluetoothService;
+import com.gmail.kyleyeeyixin.multifunction_clock.model.alarm_clock.AlarmClock;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.chime.Chime;
 import com.gmail.kyleyeeyixin.multifunction_clock.model.memory_day.MemoryDay;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.alarm_clock.AlarmClockAdapter;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.ChimeAdapter;
 import com.gmail.kyleyeeyixin.multifunction_clock.util.GSonUtil;
 import com.gmail.kyleyeeyixin.multifunction_clock.util.Utils;
@@ -66,6 +69,9 @@ public class MemoryDayFragment extends BaseFragment {
     public static final String MEMORY_DAY_DATA = "memory_day_data";
     public static final String LIST_MEMORY_DAY_DATA = "memory_day_list_data";
     public static final String EXTRA_MEMORY_DAY = "extra_memory_day";
+    public static final String EXTRA_MEMORY_ENTER = "extra_memory_enter";
+    public static final String MEMORY_ENTER = "memory_enter";
+    public static final String EXTRA_MEMORY = "extra_memory";
 
     private MemoryDay mMemoryday;
     private int mHour;
@@ -85,7 +91,14 @@ public class MemoryDayFragment extends BaseFragment {
     private String mGsonList;
     private String mNewGsonList;
     private Handler handler = new Handler();
+    private int mDeletePosition = -1;
 
+    private boolean isDelete = false;
+    private boolean isUpdate = false;
+    private boolean isSending = false;
+    private Switch mSwitch;
+    private int mPosition = -1;
+    private boolean mSwitchState = false;
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(MEMORY_DAY_LIST, (Serializable) mList);
@@ -119,7 +132,8 @@ public class MemoryDayFragment extends BaseFragment {
         intentFilter.addAction(BluetoothService.SEND_SUCCESS);
         getActivity().registerReceiver(registerReceiver, intentFilter);
 
-
+        IntentFilter getIntentFilter = new IntentFilter(BluetoothService.SEND_SUCCESS);
+        getActivity().registerReceiver(receiver, getIntentFilter);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
             if (mBluetoothAdapter.getState() != BluetoothAdapter.STATE_ON) {
@@ -166,30 +180,53 @@ public class MemoryDayFragment extends BaseFragment {
                     }
                 });
 
-        //点击发送数据给蓝牙
+        //点击发送数据给蓝牙   发送按键
         mAdapter.setOnSendListener(new MemoryDayAdapter.OnSendListener() {
             @Override
-            public void onSendClick(int position) {
+            public void onSendClick(int position, boolean isOpen, Switch v) {
+                isSending = true;
+                mSwitch = v;
+                mSwitchState = v.isChecked();
                 mProgressBar.setVisibility(View.VISIBLE);
-                mList.get(position);
+                //设置当前状态
+                mList.get(position).setType(isOpen);
                 if (Utils.judgeConnectBluetooth(getActivity()) == null) {
-                    Toast.makeText(getContext(), "请打开wifi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent intent = new Intent();
-                intent.setAction(AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY);
-                intent.putExtra(EXTRA_MEMORY_DAY, mList.get(position));
-                getActivity().sendBroadcast(intent);
-
-                Toast.makeText(getContext(), mList.get(position).getHour() + ":" +
-                        mList.get(position).getMinute(), Toast.LENGTH_LONG).show();
+                //设置闹钟
+                setMemory(mList.get(position));
             }
         });
     }
 
+    private void setMemory(MemoryDay memoryDay) {
+        //进入设置纪念日界面 广播
+        Intent enterIntent = new Intent();
+        enterIntent.setAction(AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY);
+        enterIntent.putExtra(EXTRA_MEMORY_ENTER, true);
+        getActivity().sendBroadcast(enterIntent);
+
+        //设置闹钟广播
+        final Intent intent = new Intent();
+        intent.setAction(AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY);
+        //设置当前状态
+        intent.putExtra(EXTRA_MEMORY, memoryDay);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getActivity().sendBroadcast(intent);
+            }
+        }, 1000);
+    }
+
     @OnClick(R.id.add)
     public void onAdd(View v) {
-        showDialog();
+        if (mList.size() < 5) {
+            showDialog();
+        } else {
+            Toast.makeText(getActivity(), "现在只支持5个哦~~~", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -210,13 +247,17 @@ public class MemoryDayFragment extends BaseFragment {
      * @param position
      */
     private void deleteRecycler(int position) {
+        mMemoryday = new MemoryDay();
+        mMemoryday = mList.get(position);
+        mMemoryday.setType(false);
+        mPosition = position;
         mList.remove(position);
         mAdapter.notifyItemRemoved(position);
-        if (mList.size() == 0) {
-            mEmpty.setVisibility(View.VISIBLE);
-        }
+        setMemory(mMemoryday);
+        isDelete = true;
     }
 
+    //更新
     private void updateDialog(final int position) {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         View view = layoutInflater.inflate(R.layout.memoryday_dialog, null);
@@ -367,11 +408,44 @@ public class MemoryDayFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        getActivity().unregisterReceiver(registerReceiver);
     }
 
     @Override
     protected int getViewLayoutId() {
         return R.layout.memoryday_fragment;
     }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean isSuccess = intent.getBooleanExtra(BluetoothService.EXTRA_IS_SUCCESS, false);
+            if (isSuccess) {
+                if (isUpdate) {
+                    upDataRecycler(mMemoryday, mPosition);
+                    isUpdate = false;
+                }
+                if (isDelete) {
+                    if (mList.size() == 0) {
+                        mEmpty.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                    isDelete = false;
+                }
+            } else {
+                if (isSending) {
+                    isSending = false;
+                    mSwitch.setChecked(!mSwitchState);
+                }
+                if (isDelete) {
+                    isDelete = false;
+                    mList.add(mPosition, mMemoryday);
+                    if (mList.size() != 0) {
+                        mEmpty.setVisibility(View.GONE);
+                        return;
+                    }
+                }
+            }
+        }
+    };
 }

@@ -32,5 +32,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="10dp"
-        app:backgroundTint="@color/multifunction" />
+        app:backgroundTint="@color/multifunction"
+        android:src="@drawable/ic_refresh_white_18dp"
+        />
 </RelativeLayout>

@@ -42,13 +42,13 @@
         android:layout_marginRight="5dp"
         android:background="@color/divider"></View>
 
-    <ImageButton
+    <Switch
         android:id="@+id/send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="15dp"
-        android:background="@drawable/alarm_clcok_send_btn"
-        android:padding="20dp" />
+        android:padding="20dp"  />
+
 </RelativeLayout>

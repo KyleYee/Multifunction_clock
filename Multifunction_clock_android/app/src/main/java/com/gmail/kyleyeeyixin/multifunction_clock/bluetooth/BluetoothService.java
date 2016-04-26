@@ -28,6 +28,7 @@ import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.ChimeFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.chime.NewChimeFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.memoryday.MemoryDayFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.stopwatch.StopWatchFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.module.temperature.TemperatureFragment;
 import com.gmail.kyleyeeyixin.multifunction_clock.module.time.TimeFragment;
 
 import java.io.InputStream;
@@ -61,6 +62,8 @@ public class BluetoothService extends Service {
     private boolean isConnect = false;
 
     private boolean isStopWatch = false;
+
+    private boolean isRefresh = false;
 
     //接收数据Handler
     private Handler mReceiveHandler = new Handler() {
@@ -102,6 +105,13 @@ public class BluetoothService extends Service {
                     //接收成功
                     byte[] bBuf = (byte[]) msg.obj;
                     Log.e("===========", "接收数据:" + bBuf[0]);
+                    if (isRefresh) {
+                        Intent intent = new Intent();
+                        intent.setAction(TemperatureFragment.REFRESH);
+                        intent.putExtra(TemperatureFragment.REFRESH_DATA, bBuf[0]);
+                        sendBroadcast(intent);
+                        isRefresh = false;
+                    }
                     break;
             }
         }
@@ -164,14 +174,55 @@ public class BluetoothService extends Service {
                     break;
                 case AppContent.BLUETOOTH_BROADCAST_MEMORIAL_DAY:
                     //纪念日
-                    MemoryDay memoryDay = (MemoryDay) intent.getSerializableExtra(MemoryDayFragment.EXTRA_MEMORY_DAY);
-                    if (memoryDay != null) {
-                        send(memoryDay.toString());
-                    }
+                    setMemory(intent);
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_POWER:
+                    //电量
+                    isRefresh = true;
+                    setPower(intent);
+                    break;
+                case AppContent.BLUETOOTH_BROADCAST_TMEPERATURE:
+                    //设置温度
+                    isRefresh = true;
+                    setTem(intent);
                     break;
             }
         }
     };
+
+    //设置温度
+    private void setTem(Intent intent) {
+        send(AppContent.BLUETOOTH_BROADCAST_TMEPERATURE);
+    }
+
+    //设置电量
+    private void setPower(Intent intent) {
+        send(AppContent.BLUETOOTH_BROADCAST_POWER);
+    }
+
+    //设置纪念日
+    private void setMemory(Intent intent) {
+        MemoryDay memoryDay = (MemoryDay) intent.getSerializableExtra(MemoryDayFragment.EXTRA_MEMORY);
+        boolean isEnter = intent.getBooleanExtra(MemoryDayFragment.EXTRA_MEMORY_ENTER, false);
+        if (isEnter) {
+            send(AppContent.SEND_ENTER_MEMORY_DAY);
+            return;
+        }
+        if (memoryDay != null) {
+            int state;
+            if (memoryDay.isType()) {
+                state = 1;
+            } else {
+                state = 0;
+            }
+            byte[] bytes = new byte[4];
+            bytes[0] = (byte) Integer.parseInt(String.valueOf(state), 16);
+            bytes[1] = (byte) Integer.parseInt(String.valueOf(memoryDay.getYear()).substring(2), 16);
+            bytes[2] = (byte) Integer.parseInt(String.valueOf(memoryDay.getMouth()), 16);
+            bytes[3] = (byte) Integer.parseInt(String.valueOf(memoryDay.getDay()), 16);
+            send(bytes);
+        }
+    }
 
     //设置整点报时
     private void setChime(Intent intent) {
@@ -305,7 +356,6 @@ public class BluetoothService extends Service {
                     tmpOut = null;
                     intent.putExtra(AppContent.EXTRA_SUCCEED, false);
                     sendBroadcast(intent);
-
                     return;
                 }
                 isConnect = true;

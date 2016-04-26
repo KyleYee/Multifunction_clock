@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
@@ -41,7 +42,8 @@ public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.View
 
     //Send点击回调
     public interface OnSendListener {
-        public void onSendClick(int position);
+        public void onSendClick(int position, boolean isOpen, Switch v);
+
     }
 
     private OnSendListener onSendListener;
@@ -61,7 +63,7 @@ public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         if (holder instanceof ViewHolder) {
             if (holder == null) {
                 return;
@@ -75,9 +77,21 @@ public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.View
             holder.send.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onSendListener.onSendClick(position);
+                    onSendListener.onSendClick(position, holder.send.isChecked(), holder.send);
+                    setIsOpen(holder, position);
                 }
             });
+            //改变状态
+            holder.send.setChecked(mList.get(position).isType());
+            setIsOpen(holder, position);
+        }
+    }
+
+    private void setIsOpen(ViewHolder holder, int position) {
+        if (holder.send.isChecked()) {
+            mList.get(position).setType(true);
+        } else {
+            mList.get(position).setType(false);
         }
     }
 
@@ -93,7 +107,7 @@ public class MemoryDayAdapter extends RecyclerView.Adapter<MemoryDayAdapter.View
         @Bind(R.id.date)
         TextView date;
         @Bind(R.id.send)
-        ImageButton send;
+        Switch send;
 
         public ViewHolder(View itemView) {
             super(itemView);

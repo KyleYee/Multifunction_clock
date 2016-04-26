@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.gmail.kyleyeeyixin.multifunction_clock.R;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.AppContent;
 import com.gmail.kyleyeeyixin.multifunction_clock.app.BaseFragment;
+import com.gmail.kyleyeeyixin.multifunction_clock.bluetooth.BluetoothService;
 import com.gmail.kyleyeeyixin.multifunction_clock.util.Utils;
 
 import butterknife.OnClick;
@@ -29,6 +30,7 @@ public class StopWatchFragment extends BaseFragment {
     public static final String EXTRA_STOPWATCH_RESET = "extra_stopwatch_reset";
 
     private Handler handler = new Handler();
+
     @Override
     public void onResume() {
         super.onResume();
@@ -48,6 +50,7 @@ public class StopWatchFragment extends BaseFragment {
             Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
             return;
         }
+        mIntent.setAction(AppContent.BLUETOOTH_BROADCAST_STOPWATCH);
         mIntent.putExtra(EXTRA_STOPWATCH, EXTRA_STOPWATCH_START);
         getActivity().sendBroadcast(mIntent);
     }
@@ -78,5 +81,15 @@ public class StopWatchFragment extends BaseFragment {
         return R.layout.stop_watch_fragment;
     }
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Utils.judgeConnectBluetooth(getActivity()) == null) {
+            Toast.makeText(getContext(), "请打开蓝牙", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mIntent.setAction(AppContent.BLUETOOTH_BROADCAST_STOPWATCH);
+        mIntent.putExtra(EXTRA_STOPWATCH, EXTRA_STOPWATCH_ENTER);
+        getActivity().sendBroadcast(mIntent);
+    }
 }

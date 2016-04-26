@@ -59,7 +59,7 @@ public class AppContent {
      * 5.时钟设置   10
      * 6.闹钟设置   30
      * 7.整点报时   60
-     * 8.纪念日
+     * 8.纪念日     50
      * 9.温度显示
      * 10.电量显示
      */
@@ -70,5 +70,6 @@ public class AppContent {
     public static final String SEND_ENTER_TIME = "10";
     public static final String SEND_ENTER_ALARM_CLOCK = "30";
     public static final String SEND_ENTER_CHIME = "60";
+    public static final String SEND_ENTER_MEMORY_DAY = "50";
 
 }

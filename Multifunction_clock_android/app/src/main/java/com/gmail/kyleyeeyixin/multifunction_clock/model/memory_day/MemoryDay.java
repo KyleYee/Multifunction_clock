@@ -14,6 +14,15 @@ public class MemoryDay implements Serializable {
     private int day;
     private int hour;
     private int minute;
+    private boolean type;
+
+    public boolean isType() {
+        return type;
+    }
+
+    public void setType(boolean type) {
+        this.type = type;
+    }
 
     public String getContent() {
         return content;

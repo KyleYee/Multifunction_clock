@@ -148,7 +148,7 @@ public class TimeFragment extends BaseFragment {
                             public void run() {
                                 getActivity().sendBroadcast(mIntent);
                             }
-                        },100);
+                        },1000);
                     }
                 });
                 builder.setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {

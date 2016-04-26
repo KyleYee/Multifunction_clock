@@ -293,7 +293,7 @@ public class AlarmClockFragment extends BaseFragment {
                             mPosition = position;
                             isUpdate = true;
                         }
-                    }, 1500);
+                    }, 3000);
                     return;
                 }
                 setClock(mAlarmClock);

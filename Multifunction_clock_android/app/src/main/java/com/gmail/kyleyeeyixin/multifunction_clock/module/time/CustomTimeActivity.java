@@ -134,7 +134,7 @@ public class CustomTimeActivity extends BaseActivity {
                     public void run() {
                         sendBroadcast(mIntent);
                     }
-                }, 100);
+                }, 1000);
             }
         });
 
