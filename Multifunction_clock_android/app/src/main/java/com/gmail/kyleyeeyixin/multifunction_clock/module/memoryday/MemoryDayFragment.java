@@ -99,6 +99,7 @@ public class MemoryDayFragment extends BaseFragment {
     private Switch mSwitch;
     private int mPosition = -1;
     private boolean mSwitchState = false;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(MEMORY_DAY_LIST, (Serializable) mList);
@@ -176,7 +177,8 @@ public class MemoryDayFragment extends BaseFragment {
                 new MemoryDayAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View v, int position) {
-                        updateDialog(position);
+                        Switch send = (Switch) v.findViewById(R.id.send);
+                        updateDialog(position, send);
                     }
                 });
 
@@ -245,28 +247,37 @@ public class MemoryDayFragment extends BaseFragment {
      * 删除纪念日
      *
      * @param position
+     * @param send
      */
-    private void deleteRecycler(int position) {
+    private void deleteRecycler(int position, Switch send) {
         mMemoryday = new MemoryDay();
         mMemoryday = mList.get(position);
         mMemoryday.setType(false);
         mPosition = position;
-        mList.remove(position);
-        mAdapter.notifyItemRemoved(position);
-        setMemory(mMemoryday);
-        isDelete = true;
+        if (send.isChecked()) {
+            setMemory(mMemoryday);
+            isDelete = true;
+        } else {
+            mList.remove(position);
+            mAdapter.notifyItemRemoved(position);
+            if (mList.size() == 0) {
+                mEmpty.setVisibility(View.VISIBLE);
+                return;
+            }
+        }
     }
 
     //更新
-    private void updateDialog(final int position) {
+    private void updateDialog(final int position, final Switch send) {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         View view = layoutInflater.inflate(R.layout.memoryday_dialog, null);
         MaterialCalendarView calendarView = (MaterialCalendarView) view.findViewById(R.id.calendarView);
 
         final EditText content = (EditText) view.findViewById(R.id.content);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(view);
-
+//        builder.setView(view);
+        builder.setTitle("删除纪恋日");
+        builder.setMessage("是否删除纪念日？");
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
@@ -275,7 +286,7 @@ public class MemoryDayFragment extends BaseFragment {
                 mDay = date.getDay();
             }
         });
-        builder.setNegativeButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+/*        builder.setNegativeButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -300,7 +311,7 @@ public class MemoryDayFragment extends BaseFragment {
                 //添加闹钟
                 upDataRecycler(mMemoryday, position);
             }
-        });
+        });*/
 
         builder.setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
@@ -308,10 +319,10 @@ public class MemoryDayFragment extends BaseFragment {
 
             }
         });
-        builder.setNeutralButton("删除", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("删除", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                deleteRecycler(position);
+                deleteRecycler(position, send);
             }
         });
 
@@ -421,13 +432,16 @@ public class MemoryDayFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             boolean isSuccess = intent.getBooleanExtra(BluetoothService.EXTRA_IS_SUCCESS, false);
             if (isSuccess) {
-                if (isUpdate) {
+            /*    if (isUpdate) {
                     upDataRecycler(mMemoryday, mPosition);
                     isUpdate = false;
-                }
+                }*/
                 if (isDelete) {
+                    mList.remove(mPosition);
+                    mAdapter.notifyItemRemoved(mPosition);
                     if (mList.size() == 0) {
                         mEmpty.setVisibility(View.VISIBLE);
+                        isDelete = false;
                         return;
                     }
                     isDelete = false;

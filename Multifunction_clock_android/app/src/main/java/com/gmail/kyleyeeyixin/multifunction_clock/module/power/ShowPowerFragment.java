@@ -67,7 +67,7 @@ public class ShowPowerFragment extends BaseFragment {
         mEditor = mShare.edit();
         mGetData = mShare.getInt(SAVE_DATA, -1);
         if (mGetData != -1) {
-            mPower.setCenterTitle(mGetData + "");
+            mPower.setCenterTitle(mGetData + "%");
         }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(TemperatureFragment.REFRESH);

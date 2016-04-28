@@ -250,27 +250,36 @@ public class AlarmClockFragment extends BaseFragment {
      * 删除闹钟
      *
      * @param position
+     * @param send
      */
-    private void deleteRecycler(int position) {
+    private void deleteRecycler(int position, Switch send) {
         mAlarmClock = new AlarmClock();
         mAlarmClock = mList.get(position);
         mAlarmClock.setType(false);
-        mPosition = position;
-        mList.remove(position);
-        mAdapter.notifyItemRemoved(position);
-        setClock(mAlarmClock);
-        isDelete = true;
+        if (send.isChecked()) {
+            setClock(mAlarmClock);
+            isDelete = true;
+        } else {
+            mList.remove(position);
+            mAdapter.notifyItemRemoved(position);
+            if (mList.size() == 0) {
+                mEmpty.setVisibility(View.VISIBLE);
+                return;
+            }
+            isDelete = false;
+        }
     }
 
     //更新
     private void updateDialog(final int position, final Switch send) {
-        final TimePicker timePicker = new TimePicker(getActivity());
-        timePicker.setIs24HourView(true);
+/*        final TimePicker timePicker = new TimePicker(getActivity());
+        timePicker.setIs24HourView(true);*/
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(timePicker);
-
-        builder.setNegativeButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+        /*builder.setView(timePicker);*/
+        builder.setTitle("删除闹钟");
+        builder.setMessage("是否删除当前闹钟?");
+     /*   builder.setNegativeButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -300,7 +309,7 @@ public class AlarmClockFragment extends BaseFragment {
                 mPosition = position;
                 isUpdate = true;
             }
-        });
+        });*/
 
         builder.setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
@@ -308,10 +317,10 @@ public class AlarmClockFragment extends BaseFragment {
 
             }
         });
-        builder.setNeutralButton("删除", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("删除", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                deleteRecycler(position);
+                deleteRecycler(position, send);
             }
         });
 
@@ -394,13 +403,16 @@ public class AlarmClockFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             boolean isSuccess = intent.getBooleanExtra(BluetoothService.EXTRA_IS_SUCCESS, false);
             if (isSuccess) {
-                if (isUpdate) {
+         /*       if (isUpdate) {
                     upDataRecycler(mAlarmClock, mPosition);
                     isUpdate = false;
-                }
+                }*/
                 if (isDelete) {
+                    mList.remove(mPosition);
+                    mAdapter.notifyItemRemoved(mPosition);
                     if (mList.size() == 0) {
                         mEmpty.setVisibility(View.VISIBLE);
+                        isDelete = false;
                         return;
                     }
                     isDelete = false;
