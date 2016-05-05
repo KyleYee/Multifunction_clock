@@ -125,7 +125,7 @@ public class CustomTimeActivity extends BaseActivity {
                 intent.putExtra(TimeFragment.TIME_BUNDLE, TimeFragment.TIME_ENTER);
                 sendBroadcast(intent);
 
-                Time time = new Time(mYear, mMonth, mDay, mHour, mMinute, mWeek);
+                Time time = new Time(mYear, mMonth, mDay, mHour, mMinute, mWeek-1);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(AppContent.EXTRA_TIME, time);
                 mIntent.putExtra(TimeFragment.TIME_BUNDLE, bundle);

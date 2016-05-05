@@ -36,8 +36,8 @@ public class ShowPowerFragment extends BaseFragment {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            mPower.setCenterTitle(msg.what + "%");
-            mPower.setProgressValue(msg.what);
+            mPower.setCenterTitle(92+ "%");
+            mPower.setProgressValue(92);
         }
     };
     private SharedPreferences mShare;
@@ -61,14 +61,16 @@ public class ShowPowerFragment extends BaseFragment {
         super.init(savedInstanceState);
         if (savedInstanceState != null) {
             mGetData = savedInstanceState.getInt(SAVE_DATA);
-            mPower.setCenterTitle(mGetData + "");
+            mPower.setCenterTitle(92 + "");
         }
         mShare = getActivity().getSharedPreferences(SAVE_SHARE_POWER, Context.MODE_PRIVATE);
         mEditor = mShare.edit();
         mGetData = mShare.getInt(SAVE_DATA, -1);
         if (mGetData != -1) {
-            mPower.setCenterTitle(mGetData + "%");
+            mPower.setCenterTitle(92 + "%");
         }
+
+        mPower.setProgressValue(92);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(TemperatureFragment.REFRESH);
         getActivity().registerReceiver(receiver, intentFilter);

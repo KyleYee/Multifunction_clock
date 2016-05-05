@@ -20,8 +20,6 @@ public class ProjectFragment extends BaseFragment {
     @Override
     protected void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
-        Chime chime = null;
-        textView.setText(chime + "");
     }
 
     @Override

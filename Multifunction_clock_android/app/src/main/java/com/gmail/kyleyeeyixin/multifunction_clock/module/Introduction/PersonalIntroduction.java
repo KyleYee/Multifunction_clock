@@ -47,8 +47,6 @@ public class PersonalIntroduction extends BaseActivity {
         setContentView(R.layout.personal_introduction_activity);
         ButterKnife.bind(this);
         initToolbar();
-
-        mContent.setText("个人介绍");
     }
 
     //初始化toolbar

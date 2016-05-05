@@ -139,7 +139,7 @@ public class TimeFragment extends BaseFragment {
                         intent.putExtra(TIME_BUNDLE,TIME_ENTER);
                         getActivity().sendBroadcast(intent);
 
-                        Time time = new Time(mYear, mMonth, mDay, mHour, mMinute,mWeek);
+                        Time time = new Time(mYear, mMonth, mDay, mHour, mMinute,mWeek-1);
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(AppContent.EXTRA_TIME, time);
                         mIntent.putExtra(TIME_BUNDLE, bundle);

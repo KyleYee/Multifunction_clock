@@ -113,6 +113,7 @@ public class ShowBluetoothDeviceActivity extends BaseActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 mNameList.add(device.getName());
                 mAddressList.add(device.getAddress());
+                mAdapter.notifyDataSetChanged();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

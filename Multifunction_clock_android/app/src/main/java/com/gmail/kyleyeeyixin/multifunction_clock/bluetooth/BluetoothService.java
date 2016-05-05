@@ -113,7 +113,7 @@ public class BluetoothService extends Service {
                         if (count != 1) {
                             Intent intent = new Intent();
                             intent.setAction(TemperatureFragment.REFRESH);
-                            intent.putExtra(TemperatureFragment.DATA,(int) bBuf[0]);
+                            intent.putExtra(TemperatureFragment.DATA, (int) bBuf[0]);
                             intent.putExtra(TemperatureFragment.REFRESH_DATA, (int) bBuf[1]);
                             sendBroadcast(intent);
                             isTempera = false;
@@ -140,6 +140,12 @@ public class BluetoothService extends Service {
             intent.setAction(AppContent.BLUETOOTH_CONNECT_STATE);
             intent.putExtra(AppContent.EXTRA_CONNECT_STATE, newState);
             sendBroadcast(intent);
+            if (newState == 0) {
+                isConnect = false;
+                btSocket = null;
+                mTmpOut = null;
+                mTmpIn = null;
+            }
         }
     };
 
