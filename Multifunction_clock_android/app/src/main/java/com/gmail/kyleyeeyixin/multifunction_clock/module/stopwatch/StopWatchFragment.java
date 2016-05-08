@@ -92,4 +92,6 @@ public class StopWatchFragment extends BaseFragment {
         mIntent.putExtra(EXTRA_STOPWATCH, EXTRA_STOPWATCH_ENTER);
         getActivity().sendBroadcast(mIntent);
     }
+
+
 }

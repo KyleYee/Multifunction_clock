@@ -101,6 +101,7 @@ public class NewChimeFragment extends BaseFragment {
         boolean status = mSend.isChecked();
         mEditor.putBoolean(SAVE_CHIME_STATE, status);
         mEditor.commit();
+        getActivity().unregisterReceiver(receiver);
     }
 
 
@@ -109,11 +110,14 @@ public class NewChimeFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             boolean isSuccess = intent.getBooleanExtra(BluetoothService.EXTRA_IS_SUCCESS, false);
             if (!isSuccess) {
-                mSend.setChecked(!mSendState);
-                Toast.makeText(getContext(), "失败", Toast.LENGTH_SHORT).show();
+                if (mSend != null) {
+                    mSend.setChecked(!mSendState);
+                    Toast.makeText(getContext(), "失败", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(getContext(), "成功", Toast.LENGTH_SHORT).show();
             }
         }
     };
+
 }
